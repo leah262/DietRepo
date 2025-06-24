@@ -6,7 +6,8 @@ class FXMLHttpRequest{
         this.status=0;
     }
     open(method,url){
-
+        this.state=1;
+        
     }
     send(){
 
