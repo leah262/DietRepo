@@ -1,15 +1,178 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>שוקלות מחדש</title>
+    <title>קבוצת נשים לדיאטה - כניסה ורישום</title>
+    <link rel="stylesheet" href="./css/signUp&logIn.css">
 </head>
 <body>
-    <template id="signUp">
-        <div id="signUp">
+    <div id="app-container"></div>
 
+    <!-- SIGN UP TEMPLATE -->
+    <template id="signup-template">
+        <div class="container">
+            <div class="form-wrapper">
+                <div class="header">
+                    <h1>הצטרפי למסע שלנו</h1>
+                    <p>קבוצת נשים תומכת לדיאטה ואורח חיים בריא</p>
+                </div>
+
+                <form id="signupForm" class="signup-form">
+                    <div class="form-group">
+                        <label for="firstName">שם פרטי</label>
+                        <input type="text" id="firstName" name="firstName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName">שם משפחה</label>
+                        <input type="text" id="lastName" name="lastName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="idNumber">תעודת זהות</label>
+                        <input type="text" id="idNumber" name="idNumber" maxlength="9" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="weight">משקל (ק"ג)</label>
+                            <input type="number" id="weight" name="weight" min="30" max="300" step="0.1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="height">גובה (ס"מ)</label>
+                            <input type="number" id="height" name="height" min="120" max="220" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">כתובת מייל</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">סיסמה</label>
+                        <input type="password" id="password" name="password" minlength="6" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">אישור סיסמה</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" minlength="6" required>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="healthyLifestyle" name="healthyLifestyle" required>
+                        <label for="healthyLifestyle">אני מתחייבת לשמור על אורח חיים בריא ולהיות פעילה במסע שלנו</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="privacy" name="privacy" required>
+                        <label for="privacy">אני מתחייבת לשמור על הפרטיות של הדברים הנאמרים בקבוצה ולא לחלוק מידע אישי של חברות אחרות</label>
+                    </div>
+
+                    <button type="submit" class="submit-btn">הצטרפי עכשיו</button>
+                </form>
+
+                <div class="login-link">
+                    <p>כבר חברה? <a href="#" id="switchToLogin">התחברי כאן</a></p>
+                </div>
+            </div>
+
+            <div class="side-content">
+                <div class="testimonial">
+                    <h3>הצטרפי לקהילה שלנו</h3>
+                    <p>"המסע הזה שינה את החיים שלי. לא רק ירדתי במשקל, גם מצאתי חברות אמיתיות שתומכות בי בכל שלב"</p>
+                    <span>- שרה, חברת הקבוצה</span>
+                </div>
+                
+                <div class="benefits">
+                    <h4>מה תקבלי?</h4>
+                    <ul>
+                        <li>תמיכה יומיומית מנשים כמוך</li>
+                        <li>טיפים ומתכונים בריאים</li>
+                        <li>מעקב התקדמות אישי</li>
+                        <li>קבוצת ווטסאפ פעילה</li>
+                        <li>פגישות שבועיות (אופציונלי)</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </template>
+
+    <!-- LOG IN TEMPLATE -->
+    <template id="login-template">
+        <div class="container">
+            <div class="form-wrapper login-form-wrapper">
+                <div class="header">
+                    <h1>ברוכה השבה!</h1>
+                    <p>התחברי ובואי נמשיך יחד במסע</p>
+                </div>
+
+                <form id="loginForm" class="login-form">
+                    <div class="form-group">
+                        <label for="loginEmail">כתובת מייל</label>
+                        <input type="email" id="loginEmail" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="loginPassword">סיסמה</label>
+                        <input type="password" id="loginPassword" name="password" required>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="rememberMe" name="rememberMe">
+                        <label for="rememberMe">זכור אותי</label>
+                    </div>
+
+                    <button type="submit" class="submit-btn">התחברי</button>
+
+                    <div class="forgot-password">
+                        <a href="#" id="forgotPassword">שכחת סיסמה?</a>
+                    </div>
+                </form>
+
+                <div class="signup-link">
+                    <p>עדיין לא חברה? <a href="#" id="switchToSignup">הירשמי כאן</a></p>
+                </div>
+            </div>
+
+            <div class="side-content">
+                <div class="welcome-back">
+                    <h3>שמחות לראות אותך שוב! 💖</h3>
+                    <p>המסע שלנו ממשיך, והקהילה מחכה לך</p>
+                </div>
+                
+                <div class="daily-motivation">
+                    <h4>המוטיבציה של היום</h4>
+                    <blockquote>
+                        "כל יום הוא הזדמנות חדשה להתחיל מחדש ולהיות הגרסה הטובה ביותר של עצמנו"
+                    </blockquote>
+                </div>
+
+                <div class="quick-stats">
+                    <h4>הישגי הקבוצה השבוע</h4>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-number">24</span>
+                            <span class="stat-label">ק"ג ירדו</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">156</span>
+                            <span class="stat-label">אימונים</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">89</span>
+                            <span class="stat-label">מתכונים חדשים</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="./js/signUp.js"></script>
+    <script src="./js/logIn.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>

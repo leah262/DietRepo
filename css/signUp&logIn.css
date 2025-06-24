@@ -1,0 +1,420 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #ffeef8 0%, #f0e6ff 50%, #e6f3ff 100%);
+    min-height: 100vh;
+    direction: rtl;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: start;
+    min-height: 100vh;
+}
+
+/* Form wrapper */
+.form-wrapper {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    color: #d63384;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.header p {
+    color: #6c757d;
+    font-size: 1.1rem;
+}
+
+/* Form styles */
+.signup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    color: #495057;
+    font-weight: 500;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.form-group input {
+    padding: 12px 16px;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #d63384;
+    box-shadow: 0 0 0 3px rgba(214, 51, 132, 0.1);
+    background: white;
+}
+
+.form-group input:valid {
+    border-color: #28a745;
+}
+
+/* Checkbox groups */
+.checkbox-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 15px;
+    background: rgba(214, 51, 132, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(214, 51, 132, 0.1);
+}
+
+.checkbox-group input[type="checkbox"] {
+    margin-top: 2px;
+    transform: scale(1.2);
+    accent-color: #d63384;
+}
+
+.checkbox-group label {
+    color: #495057;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    cursor: pointer;
+    margin: 0;
+}
+
+/* Submit button */
+.submit-btn {
+    background: linear-gradient(135deg, #d63384 0%, #ff6b9d 100%);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+    box-shadow: 0 5px 15px rgba(214, 51, 132, 0.3);
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(214, 51, 132, 0.4);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+/* Login link */
+.login-link, .signup-link {
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+}
+
+.login-link p, .signup-link p {
+    color: #6c757d;
+}
+
+.login-link a, .signup-link a {
+    color: #d63384;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.login-link a:hover, .signup-link a:hover {
+    color: #b02a5b;
+    text-decoration: underline;
+}
+
+/* Login form specific styles */
+.login-form-wrapper {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.forgot-password {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.forgot-password a {
+    color: #6c757d;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.forgot-password a:hover {
+    color: #d63384;
+    text-decoration: underline;
+}
+
+/* Welcome back section */
+.welcome-back {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    border: 2px solid rgba(214, 51, 132, 0.1);
+}
+
+.welcome-back h3 {
+    color: #d63384;
+    margin-bottom: 15px;
+    font-size: 1.4rem;
+}
+
+.welcome-back p {
+    color: #495057;
+    line-height: 1.6;
+}
+
+/* Daily motivation */
+.daily-motivation {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.daily-motivation h4 {
+    color: #d63384;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.daily-motivation blockquote {
+    color: #495057;
+    font-style: italic;
+    line-height: 1.6;
+    border-right: 3px solid #d63384;
+    padding-right: 15px;
+    margin: 0;
+}
+
+/* Quick stats */
+.quick-stats {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.quick-stats h4 {
+    color: #d63384;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 15px 10px;
+    background: rgba(214, 51, 132, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(214, 51, 132, 0.1);
+}
+
+.stat-number {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #d63384;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* Side content */
+.side-content {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.testimonial {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid #d63384;
+}
+
+.testimonial h3 {
+    color: #d63384;
+    margin-bottom: 15px;
+    font-size: 1.4rem;
+}
+
+.testimonial p {
+    color: #495057;
+    font-style: italic;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.testimonial span {
+    color: #6c757d;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.benefits {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.benefits h4 {
+    color: #d63384;
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+}
+
+.benefits ul {
+    list-style: none;
+    padding: 0;
+}
+
+.benefits li {
+    color: #495057;
+    padding: 8px 0;
+    position: relative;
+    padding-right: 25px;
+}
+
+.benefits li::before {
+    content: "💖";
+    position: absolute;
+    right: 0;
+    top: 8px;
+}
+
+/* Error messages */
+.error {
+    color: #dc3545;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    display: none;
+}
+
+.form-group.error input {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+/* Success messages */
+.success {
+    background: #d4edda;
+    color: #155724;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #c3e6cb;
+    margin-bottom: 20px;
+    display: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 15px;
+    }
+    
+    .form-wrapper {
+        padding: 25px;
+    }
+    
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .side-content {
+        margin-top: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-wrapper {
+        padding: 20px;
+    }
+    
+    .header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .checkbox-group {
+        padding: 12px;
+    }
+    
+    .checkbox-group label {
+        font-size: 0.85rem;
+    }
+}
