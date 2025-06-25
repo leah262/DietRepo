@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>קבוצת נשים לדיאטה - כניסה ורישום</title>
     <link rel="stylesheet" href="./css/signUp&logIn.css">
 </head>
+
 <body>
     <div id="appContainer"></div>
 
@@ -29,10 +31,7 @@
                         <input type="text" id="lastName" name="lastName" required>
                     </div>
 
-                    <div class="form-group">
-                        <label for="idNumber">תעודת זהות</label>
-                        <input type="text" id="idNumber" name="idNumber" maxlength="9" required>
-                    </div>
+
 
                     <div class="form-row">
                         <div class="form-group">
@@ -68,7 +67,8 @@
 
                     <div class="checkbox-group">
                         <input type="checkbox" id="privacy" name="privacy" required>
-                        <label for="privacy">אני מתחייבת לשמור על הפרטיות של הדברים הנאמרים בקבוצה ולא לחלוק מידע אישי של חברות אחרות</label>
+                        <label for="privacy">אני מתחייבת לשמור על הפרטיות של הדברים הנאמרים בקבוצה ולא לחלוק מידע אישי
+                            של חברות אחרות</label>
                     </div>
 
                     <button type="submit" class="submit-btn">הצטרפי עכשיו</button>
@@ -85,7 +85,7 @@
                     <p>"המסע הזה שינה את החיים שלי. לא רק ירדתי במשקל, גם מצאתי חברות אמיתיות שתומכות בי בכל שלב"</p>
                     <span>- שרה, חברת הקבוצה</span>
                 </div>
-                
+
                 <div class="benefits">
                     <h4>מה תקבלי?</h4>
                     <ul>
@@ -120,16 +120,8 @@
                         <input type="password" id="loginPassword" name="password" required>
                     </div>
 
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="rememberMe" name="rememberMe">
-                        <label for="rememberMe">זכור אותי</label>
-                    </div>
-
                     <button type="submit" class="submit-btn">התחברי</button>
 
-                    <div class="forgot-password">
-                        <a href="#" id="forgotPassword">שכחת סיסמה?</a>
-                    </div>
                 </form>
 
                 <div class="signup-link">
@@ -142,7 +134,7 @@
                     <h3>שמחות לראות אותך שוב! 💖</h3>
                     <p>המסע שלנו ממשיך, והקהילה מחכה לך</p>
                 </div>
-                
+
                 <div class="daily-motivation">
                     <h4>המוטיבציה של היום</h4>
                     <blockquote>
@@ -170,8 +162,10 @@
             </div>
         </div>
     </template>
-    <script src="./js/app.js"></script>
-    <script src="./js/signUp.js"></script>
-    <script src="./js/logIn.js"></script>
+    <script type="module" src="./js/app.js"></script>
+    <script type="module" src="./js/signUp.js"></script>
+    <!-- <script type="module" src="./js/logIn.js"></script> -->
+    <script type="module" src="./js/AurhManager.js"></script>
 </body>
+
 </html>
