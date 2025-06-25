@@ -1,11 +1,14 @@
 import HttpRequest from "./HttpRequest";
+import NetWork from "./NetWork";
 class FXMLHttpRequest extends EventTarget {
     constructor() {
         super()
         console.log("in XML constructor");
         // this.network=new NetWork;
-        this.state = '';
+        this._state = 0;
         this.status = 0;
+        this.request;
+        this.netWork=NetWork();
     }
     set state(newState) {
         this._state = newState; // נשתמש בשם אחר לשמירה פנימית כדי למנוע רקורסיה
@@ -20,11 +23,12 @@ class FXMLHttpRequest extends EventTarget {
     open(method, url) {
         this.state = 1;
         console.log("opening");
-        let request=new HttpRequest(method,'',url)
+        this.request=new HttpRequest(method,url)
 
     }
     send() {
-
+        this.netWork.sendRequest(this.request);
+        this.state=2;
     }
     onReadyStateChange() {
 

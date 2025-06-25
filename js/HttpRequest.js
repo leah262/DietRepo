@@ -1,7 +1,6 @@
 class HttpRequest{
-    constructor(method, server, section){
+    constructor(method, section){
         this.method=method;
-        this.server=server;
         this.section=section;
     }
 }
