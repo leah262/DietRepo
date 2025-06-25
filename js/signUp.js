@@ -1,6 +1,7 @@
 import AuthManager from './AurhManager.js';
 import { switchPage } from './app.js';
 import User from './User.js'
+import FXMLHttpRequest from './FXMLHttpRequest.js';
 class SignUpManager {
     constructor() {
         this.form = null;
@@ -108,6 +109,12 @@ class SignUpManager {
         // לדוגמה: שליחה לשרת, שמירה במסד נתונים וכו'
         
         let user =new User(userData.firstName,userData.lastName,userData.email,userData.height,userData.weight,userData.password)
+        let fxhr=new FXMLHttpRequest();
+        fxhr.addEventListener('onReadyStateChange', (e)=>{
+            let fxhr=e.target
+            console.log(fxhr.state);
+        })
+        fxhr.open('GET',"basicURL")
         console.log('User data ready for registration:', userData);
         console.log(user);
         setTimeout(() => {

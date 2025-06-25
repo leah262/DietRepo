@@ -1,4 +1,4 @@
-import {DB}from "./DB.js";
+import DB from "./DB.js";
 class InfoDB extends DB{
     constructor(){
         super();

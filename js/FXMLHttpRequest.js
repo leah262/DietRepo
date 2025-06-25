@@ -1,21 +1,34 @@
-class FXMLHttpRequest{
-    constructor(){
+class FXMLHttpRequest extends EventTarget {
+    constructor() {
+        super()
         console.log("in XML constructor");
-        this.network=new NetWork;
-        this.state=0;
-        this.status=0;
+        // this.network=new NetWork;
+        this.state = '';
+        this.status = 0;
     }
-    open(method,url){
-        this.state=1;
-        
+    set state(newState) {
+        this._state = newState; // נשתמש בשם אחר לשמירה פנימית כדי למנוע רקורסיה
+        const event = new CustomEvent('onReadyStateChange', {
+            detail: { state: newState }
+        });
+        this.dispatchEvent(event); // שליחת האירוע
     }
-    send(){
+    get state() {
+        return this._state;
+    }
+    open(method, url) {
+        this.state = 1;
+        console.log("opening");
 
     }
-    onReadyStateChange(){
+    send() {
 
     }
-    onError(type){
+    onReadyStateChange() {
+
+    }
+    onError(type) {
 
     }
 }
+export default FXMLHttpRequest;

@@ -5,3 +5,4 @@ class HttpRequest{
         this.section=section;
     }
 }
+export default HttpRequest;

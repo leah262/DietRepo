@@ -1,4 +1,3 @@
-export default DB;
 class DB {
     constructor() {
         this.id=1;
@@ -20,3 +19,4 @@ class DB {
         localStorage.setItem(key,data);        
     }
 }
+export default DB;

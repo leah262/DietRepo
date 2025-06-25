@@ -8,6 +8,7 @@ class User{
         this.height=height;
         this.password=password;
         this.bmi=this.calculateBMI();
+        this.bmiCategory='';
         this.init();
     }
     init(){
@@ -18,13 +19,11 @@ class User{
         if (this.weight && this.height) {
             const heightInMeters = this.height / 100;
             const bmi = this.weight / (heightInMeters * heightInMeters);
-            let bmiCategory = '';
-            if (bmi < 18.5) bmiCategory = 'תת משקל';
-            else if (bmi < 25) bmiCategory = 'משקל תקין';
-            else if (bmi < 30) bmiCategory = 'עודף משקל';
-            else bmiCategory = 'השמנה';
+            if (bmi < 18.5) this.bmiCategory = 'תת משקל';
+            else if (bmi < 25) this.bmiCategory = 'משקל תקין';
+            else if (bmi < 30) this.bmiCategory = 'עודף משקל';
+            else this.bmiCategory = 'השמנת יתר!!';
             return bmi;
-            console.log(`BMI: ${bmi.toFixed(1)} (${bmiCategory})`);
         }
     }
 

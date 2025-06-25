@@ -4,3 +4,4 @@ class HttpRespon{
         this.data=data;
     }
 }
+export default HttpRespon;
