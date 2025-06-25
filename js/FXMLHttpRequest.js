@@ -1,3 +1,4 @@
+import HttpRequest from "./HttpRequest";
 class FXMLHttpRequest extends EventTarget {
     constructor() {
         super()
@@ -19,6 +20,7 @@ class FXMLHttpRequest extends EventTarget {
     open(method, url) {
         this.state = 1;
         console.log("opening");
+        let request=new HttpRequest(method,'',url)
 
     }
     send() {
