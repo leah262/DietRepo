@@ -1,5 +1,5 @@
-import AuthManager from './AurhManager';
-// import { goToSignUp } from './app.js';
+import AuthManager from './AurhManager.js';
+import { switchPage } from './app.js';
 
 class LoginManager {
     constructor() {
@@ -9,13 +9,11 @@ class LoginManager {
 
     init() {
         if (this.isInitialized) return;
-        
         this.bindEvents();
         this.isInitialized = true;
     }
 
     bindEvents() {
-        // האזנה לטעינת דף ההתחברות
         document.addEventListener('pageLoaded', (e) => {
             if (e.detail.pageName === 'login') {
                 this.setupLoginPage();
@@ -24,46 +22,36 @@ class LoginManager {
     }
 
     setupLoginPage() {
-        this.form = document.querySelector('#loginForm');
-        
-        if (!this.form) {
-            console.error('Login form not found');
-            return;
-        }
+        // המתנה קצרה לוודא שהעמוד נטען במלואו
+        setTimeout(() => {
+            this.form = document.querySelector('#loginForm');
+            
+            if (!this.form) {
+                console.error('Login form not found');
+                return;
+            }
 
-        this.attachFormEvents();
-        this.loadRememberedCredentials();
+            this.attachFormEvents();
+        }, 10);
     }
 
     attachFormEvents() {
-        // אירוע שליחת הטופס
         this.form.addEventListener('submit', (e) => this.handleSubmit(e));
-
-        // אירוע מעבר לרישום
+        
         const switchToSignupBtn = document.getElementById('switchToSignup');
         if (switchToSignupBtn) {
             switchToSignupBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                this.switchToSignUp();
+                console.log("Switching to signup page");
+                switchPage('signUp');
             });
         }
-
-        // אירוע שכחתי סיסמה (אם יש כזה כפתור)
-        const forgotPasswordBtn = document.getElementById('forgotPassword');
-        if (forgotPasswordBtn) {
-            forgotPasswordBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.handleForgotPassword();
-            });
-        }
-
-        // אירועי בדיקה של שדות
+        
         this.attachFieldValidation();
     }
 
     attachFieldValidation() {
         const inputs = this.form.querySelectorAll('input');
-        
         inputs.forEach(input => {
             // בדיקה כשעוזבים את השדה
             input.addEventListener('blur', () => {
@@ -72,7 +60,9 @@ class LoginManager {
 
             // הסתרת שגיאות כשמתחילים להקליד
             input.addEventListener('input', () => {
-                AuthManager.hideFieldError(input);
+                if (AuthManager && AuthManager.hideFieldError) {
+                    AuthManager.hideFieldError(input);
+                }
             });
         });
     }
@@ -81,10 +71,31 @@ class LoginManager {
         const fieldName = input.name;
         const fieldValue = input.value;
         
-        const validation = AuthManager.validateLoginField(fieldName, fieldValue);
+        // ולידציה בסיסית
+        let isValid = true;
+        let message = '';
         
-        if (!validation.isValid) {
-            AuthManager.showFieldError(input, validation.message);
+        if (fieldName === 'email') {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!fieldValue) {
+                isValid = false;
+                message = 'נא להזין כתובת מייל';
+            } else if (!emailRegex.test(fieldValue)) {
+                isValid = false;
+                message = 'כתובת המייל אינה תקינה';
+            }
+        } else if (fieldName === 'password') {
+            if (!fieldValue) {
+                isValid = false;
+                message = 'נא להזין סיסמה';
+            } else if (fieldValue.length < 6) {
+                isValid = false;
+                message = 'הסיסמה חייבת להכיל לפחות 6 תווים';
+            }
+        }
+
+        if (!isValid && AuthManager && AuthManager.showFieldError) {
+            AuthManager.showFieldError(input, message);
             return false;
         }
 
@@ -93,126 +104,84 @@ class LoginManager {
 
     handleSubmit(e) {
         e.preventDefault();
-        
         const submitBtn = this.form.querySelector('.submit-btn');
-        AuthManager.setButtonLoading(submitBtn, 'מתחברת...');
-
-        // איסוף נתוני הטופס
-        const formData = AuthManager.collectFormData(this.form);
         
-        // בדיקת תקינות הטופס
-        const validation = AuthManager.validateLoginForm(formData);
-
-        if (validation.isValid) {
+        if (AuthManager && AuthManager.setButtonLoading) {
+            AuthManager.setButtonLoading(submitBtn, 'מתחברת...');
+        }
+        
+        const formData = this.collectFormData();
+        
+        if (this.validateLoginForm(formData)) {
             this.processLogin(formData, submitBtn);
         } else {
-            AuthManager.showFormErrors(this.form, validation.errors);
-            AuthManager.resetButton(submitBtn);
+            if (AuthManager && AuthManager.resetButton) {
+                AuthManager.resetButton(submitBtn);
+            }
         }
     }
 
-    processLogin(loginData, submitBtn) {
-        // כאן תטפלי בהתחברות המשתמש בפועל
-        // לדוגמה: שליחה לשרת, בדיקת סיסמה וכו'
+    collectFormData() {
+        const formData = new FormData(this.form);
+        return {
+            email: formData.get('email'),
+            password: formData.get('password')
+        };
+    }
+
+    validateLoginForm(formData) {
+        let isValid = true;
         
-        console.log('Login data ready for authentication:', loginData);
+        // ולידציה בסיסית
+        if (!formData.email || !formData.password) {
+            isValid = false;
+            console.log('Missing required fields');
+        }
         
-        // סימולציה של התחברות מוצלחת
+        return isValid;
+    }
+
+    processLogin(userData, submitBtn) {
+        // כאן תטפלי בכניסה בפועל
+        // לדוגמה: שליחה לשרת, בדיקת פרטי התחברות וכו'
+        
+        console.log('Login attempt with:', userData);
+        
         setTimeout(() => {
-            this.handleSuccessfulLogin(loginData, submitBtn);
+            this.handleSuccessfulLogin(submitBtn);
         }, 1500);
     }
 
-    handleSuccessfulLogin(loginData, submitBtn) {
-        // הצגת הודעת הצלחה
-        AuthManager.showSuccessMessage(
-            this.form, 
-            'התחברת בהצלחה! ברוכה השבה 💖'
-        );
-
-        // שמירת פרטים אם המשתמש בחר (אם יש checkbox זכור אותי)
-        this.saveCredentialsIfRequested(loginData);
-
-        AuthManager.resetButton(submitBtn);
-
-        // הפניה לדף הבית
+    handleSuccessfulLogin(submitBtn) {
+        if (AuthManager && AuthManager.showSuccessMessage) {
+            AuthManager.showSuccessMessage(
+                this.form, 
+                'התחברת בהצלחה! ברוכה השבה 💖'
+            );
+        }
+        
+        this.form.reset();
+        
+        if (AuthManager && AuthManager.resetButton) {
+            AuthManager.resetButton(submitBtn);
+        }
+        
         setTimeout(() => {
-            alert('ברוכה השבה! מעבירה אותך לדף הבית');
-            // כאן תוכלי להפנות לדף הבית
-            // לדוגמה: goToHome()
+            alert('ברוכה השבה! כעת תועברי לעמוד הבית של הקבוצה');
+            // כאן תוכלי להעביר למסך הראשי של האפליקציה
         }, 2000);
     }
 
-    handleForgotPassword() {
-        const emailInput = document.getElementById('loginEmail');
-        const email = emailInput ? emailInput.value.trim() : '';
-        
-        if (!email) {
-            alert('אנא הכניסי את כתובת המייל שלך תחילה');
-            if (emailInput) emailInput.focus();
-            return;
-        }
-
-        const emailValidation = AuthManager.validateEmail(email);
-        if (!emailValidation.isValid) {
-            alert('אנא הכניסי כתובת מייל תקינה');
-            return;
-        }
-
-        // כאן תטפלי בשליחת מייל לאיפוס סיסמה
-        alert(`נשלח מייל לאיפוס סיסמה לכתובת: ${email}`);
-        console.log(`Password reset requested for: ${email}`);
-    }
-
-    switchToSignUp() {
-        goToSignUp();
-    }
-
-    // פונקציות עזר לזכירת פרטים
-    loadRememberedCredentials() {
-        // כאן תוכלי לטעון פרטים שמורים (אם החלטת לשמור)
-        // לדוגמה מ-localStorage (אבל לא בתוך artifacts)
-        console.log('Loading remembered credentials...');
-    }
-
-    saveCredentialsIfRequested(loginData) {
-        const rememberMeCheckbox = document.getElementById('rememberMe');
-        
-        if (rememberMeCheckbox && rememberMeCheckbox.checked) {
-            // כאן תוכלי לשמור פרטים (מחוץ ל-artifacts)
-            console.log('Saving credentials for future use');
-        }
-    }
-
-    // פונקציות עזר נוספות
     resetForm() {
         if (this.form) {
             this.form.reset();
-            AuthManager.clearFormErrors(this.form);
-        }
-    }
-
-    isFormValid() {
-        if (!this.form) return false;
-        
-        const formData = AuthManager.collectFormData(this.form);
-        const validation = AuthManager.validateLoginForm(formData);
-        
-        return validation.isValid;
-    }
-
-    focusFirstField() {
-        if (this.form) {
-            const firstInput = this.form.querySelector('input');
-            if (firstInput) firstInput.focus();
+            if (AuthManager && AuthManager.clearFormErrors) {
+                AuthManager.clearFormErrors(this.form);
+            }
         }
     }
 }
 
-// יצירת instance יחיד
 const loginManager = new LoginManager();
-
-// אתחול
 loginManager.init();
-
 export default loginManager;

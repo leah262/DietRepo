@@ -1,8 +1,9 @@
+
 class User{
-    constructor(firstName, lastName,id,height, weight, password){
+    constructor(firstName, lastName,email,height, weight, password){
         this.firstName=firstName;
         this.lastName=lastName;
-        this.id=id;
+        this.email=email;
         this.weight=weight;
         this.height=height;
         this.password=password;
@@ -10,7 +11,7 @@ class User{
         this.init();
     }
     init(){
-        let fxhr=new FXHRLHttpRequest();
+        // let fxhr=new FXHRLHttpRequest();
         //writing to db
     }
         calculateBMI() {
@@ -28,3 +29,5 @@ class User{
     }
 
 }
+
+export default User;

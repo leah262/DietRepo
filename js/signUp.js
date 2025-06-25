@@ -1,6 +1,6 @@
 import AuthManager from './AurhManager.js';
-import {  switchPage } from './app.js';
-
+import { switchPage } from './app.js';
+import User from './User.js'
 class SignUpManager {
     constructor() {
         this.form = null;
@@ -14,35 +14,42 @@ class SignUpManager {
     }
 
     bindEvents() {
-        document.addEventListener('pageLoaded', (e) => {
-            if (e.detail.pageName === 'signUp') {
+        // document.addEventListener('pageLoaded', (e) => {
+        //     if (e.detail.pageName === 'signUp') {
                 this.setupSignUpPage();
-            }
-        });
+        //     }
+        // });
     }
 
     setupSignUpPage() {
-        this.form = document.querySelector('#signupForm');
-        
-        if (!this.form) {
-            console.error('SignUp form not found');
-            return;
-        }
+        // המתנה קצרה לוודא שהעמוד נטען במלואו
+        setTimeout(() => {
+            this.form = document.querySelector('#signupForm');
+            
+            if (!this.form) {
+                console.error('SignUp form not found');
+                return;
+            }
 
-        this.attachFormEvents();
+            this.attachFormEvents();
+        }, 10);
     }
 
     attachFormEvents() {
         this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+        
         const switchToLoginBtn = document.getElementById('switchToLogin');
         if (switchToLoginBtn) {
             switchToLoginBtn.addEventListener('click', (e) => {
                 e.preventDefault();
+                console.log("Switching to login page");
                 switchPage('login');
             });
         }
+        
         this.attachFieldValidation();
     }
+
     attachFieldValidation() {
         const inputs = this.form.querySelectorAll('input');
         inputs.forEach(input => {
@@ -57,6 +64,7 @@ class SignUpManager {
             });
         });
     }
+
     validateSingleField(input) {
         const fieldName = input.name;
         const fieldValue = input.value;
@@ -77,29 +85,36 @@ class SignUpManager {
 
         return true;
     }
+
     handleSubmit(e) {
+        console.log("submit");
+        
         e.preventDefault();
         const submitBtn = this.form.querySelector('.submit-btn');
         AuthManager.setButtonLoading(submitBtn, 'רושמת...');
         const formData = AuthManager.collectFormData(this.form);
         const validation = AuthManager.validateSignUpForm(formData);
-        if (validation.isValid) {
-            this.processSignUp(formData, submitBtn);
-        } else {
-            AuthManager.showFormErrors(this.form, validation.errors);
-            AuthManager.resetButton(submitBtn);
-        }
+                    this.processSignUp(formData, submitBtn);
+        // if (validation.isValid) {
+        //     this.processSignUp(formData, submitBtn);
+        // } else {
+        //     AuthManager.showFormErrors(this.form, validation.errors);
+        //     AuthManager.resetButton(submitBtn);
+        // }
     }
+
     processSignUp(userData, submitBtn) {
         // כאן תטפלי ברישום המשתמש בפועל
         // לדוגמה: שליחה לשרת, שמירה במסד נתונים וכו'
-
-        console.log('User data ready for registration:', userData);
         
+        let user =new User(userData.firstName,userData.lastName,userData.email,userData.height,userData.weight,userData.password)
+        console.log('User data ready for registration:', userData);
+        console.log(user);
         setTimeout(() => {
             this.handleSuccessfulSignUp(submitBtn);
         }, 1500);
     }
+
     handleSuccessfulSignUp(submitBtn) {
         AuthManager.showSuccessMessage(
             this.form, 
@@ -112,12 +127,14 @@ class SignUpManager {
             alert('ברוכה הבאה! כעת תועברי לעמוד הבית של הקבוצה');
         }, 2000);
     }
+
     resetForm() {
         if (this.form) {
             this.form.reset();
             AuthManager.clearFormErrors(this.form);
         }
     }
+
     isFormValid() {
         if (!this.form) return false;
         
@@ -127,6 +144,7 @@ class SignUpManager {
         return validation.isValid;
     }
 }
+
 const signUpManager = new SignUpManager();
 signUpManager.init();
 export default signUpManager;
