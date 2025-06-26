@@ -1,7 +1,8 @@
 class HttpRequest{
-    constructor(method, section){
+    constructor(method, url){
         this.method=method;
-        this.section=new URL(section);
+        this.section=url;
+        // this.url=new URL(url);
         console.log("new request");
         
     }

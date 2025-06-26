@@ -114,7 +114,7 @@ class SignUpManager {
             let fxhr=e.target
             console.log(fxhr.state);
         })
-        fxhr.open('GET',"https//Users-Servers/p1")
+        fxhr.open('GET','http://localhost/api/Users-Servers/user?email=test@example.com');
         console.log('User data ready for registration:', userData);
         console.log(user);
         fxhr.send();
