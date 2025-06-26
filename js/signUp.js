@@ -114,9 +114,11 @@ class SignUpManager {
             let fxhr=e.target
             console.log(fxhr.state);
         })
-        fxhr.open('GET',"basicURL")
+        fxhr.open('GET',"https//Users-Servers/p1")
         console.log('User data ready for registration:', userData);
         console.log(user);
+        fxhr.send();
+        
         setTimeout(() => {
             this.handleSuccessfulSignUp(submitBtn);
         }, 1500);

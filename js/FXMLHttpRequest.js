@@ -1,5 +1,5 @@
-import HttpRequest from "./HttpRequest";
-import NetWork from "./NetWork";
+import HttpRequest from "./HttpRequest.js";
+import NetWork from "./NetWork.js";
 class FXMLHttpRequest extends EventTarget {
     constructor() {
         super()
@@ -8,7 +8,7 @@ class FXMLHttpRequest extends EventTarget {
         this._state = 0;
         this.status = 0;
         this.request;
-        this.netWork=NetWork();
+        this.netWork=NetWork;
     }
     set state(newState) {
         this._state = newState; // נשתמש בשם אחר לשמירה פנימית כדי למנוע רקורסיה

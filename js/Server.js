@@ -1,4 +1,9 @@
 class Server{
+    constructor(){
+    }
+    handleRequest(request){
+        console.log(request);
+    }
     get(page){
 
     }
@@ -12,3 +17,4 @@ class Server{
 
     }
 }
+// export default new Server();

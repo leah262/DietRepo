@@ -1,12 +1,18 @@
+import  UserServer from "./UserServer.js";
+// import  InfoServer from "./infoServer.js";
+
 class NetWork {
     constructor() {
-        this.usersServer = new InfoServer();
-        this.infoServer = new FilmsServer();
+        this.usersServer =  UserServer;
+        // this.infoServer = new FilmsServer();
     }
 
-    sendRequest(url, data, callback) {
+    sendRequest(request,callback) {
+        console.log("in network");
+        console.log(request);
+        
         let response;
-        url = new URL(url);
+        url = request.section;
         if (url.protocol !== "http:" && url.protocol !== "https:") {
             response = "Invalid protocol";
             callback(response);
@@ -14,7 +20,9 @@ class NetWork {
         }
         let pathParts = url.pathname.split('/').filter(Boolean);
         if (pathParts[1] === "Users-Servers") {
-            response = this.usersServer.handleRequest(url, data);
+            response = this.usersServer.handleRequest(request);
+            console.log("go to user server");
+            
         } else if (pathParts[1] === "Info-Server") {
             response = this.infoServer.handleRequest(url, data);
         } else {
@@ -24,3 +32,4 @@ class NetWork {
     }
 
 }
+export default new NetWork();

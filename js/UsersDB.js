@@ -35,3 +35,4 @@ class UsersDB extends DB{
     }
 
 }
+export default new UsersDB();
