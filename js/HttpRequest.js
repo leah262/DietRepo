@@ -1,10 +1,8 @@
-class HttpRequest{
-    constructor(method, url){
-        this.method=method;
-        this.section=url;
-        // this.url=new URL(url);
-        console.log("new request");
-        
+class HttpRequest {
+    constructor(method, section) {
+        this.method = method;
+        this.section = new URL(section, "https://fake.server"); // פתרון כאן
+        console.log("new request:", this.method, this.section.href);
     }
 }
 export default HttpRequest;
