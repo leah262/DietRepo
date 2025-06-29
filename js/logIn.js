@@ -1,5 +1,6 @@
 import AuthManager from './AurhManager.js';
 import { switchPage } from './app.js';
+import FXMLHttpRequest from './FXMLHttpRequest.js';
 
 class LoginManager {
     constructor() {
@@ -22,10 +23,9 @@ class LoginManager {
     }
 
     setupLoginPage() {
-        // המתנה קצרה לוודא שהעמוד נטען במלואו
         setTimeout(() => {
             this.form = document.querySelector('#loginForm');
-            
+
             if (!this.form) {
                 console.error('Login form not found');
                 return;
@@ -37,31 +37,29 @@ class LoginManager {
 
     attachFormEvents() {
         this.form.addEventListener('submit', (e) => this.handleSubmit(e));
-        
-        const switchToSignupBtn = document.getElementById('switchToSignup');
-        if (switchToSignupBtn) {
-            switchToSignupBtn.addEventListener('click', (e) => {
+
+        const switchToSignUpBtn = document.getElementById('switchToSignUp');
+        if (switchToSignUpBtn) {
+            switchToSignUpBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 console.log("Switching to signup page");
                 switchPage('signUp');
             });
         }
-        
+
         this.attachFieldValidation();
     }
 
     attachFieldValidation() {
         const inputs = this.form.querySelectorAll('input');
         inputs.forEach(input => {
-            // בדיקה כשעוזבים את השדה
-            input.addEventListener('blur', () => {
-                this.validateSingleField(input);
+            input.addEventListener('focus', () => {
+                AuthManager.hideFieldError(input);
             });
 
-            // הסתרת שגיאות כשמתחילים להקליד
-            input.addEventListener('input', () => {
-                if (AuthManager && AuthManager.hideFieldError) {
-                    AuthManager.hideFieldError(input);
+            input.addEventListener('blur', () => {
+                if (input.value.trim()) {
+                    this.validateSingleField(input);
                 }
             });
         });
@@ -70,32 +68,11 @@ class LoginManager {
     validateSingleField(input) {
         const fieldName = input.name;
         const fieldValue = input.value;
-        
-        // ולידציה בסיסית
-        let isValid = true;
-        let message = '';
-        
-        if (fieldName === 'email') {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!fieldValue) {
-                isValid = false;
-                message = 'נא להזין כתובת מייל';
-            } else if (!emailRegex.test(fieldValue)) {
-                isValid = false;
-                message = 'כתובת המייל אינה תקינה';
-            }
-        } else if (fieldName === 'password') {
-            if (!fieldValue) {
-                isValid = false;
-                message = 'נא להזין סיסמה';
-            } else if (fieldValue.length < 6) {
-                isValid = false;
-                message = 'הסיסמה חייבת להכיל לפחות 6 תווים';
-            }
-        }
 
-        if (!isValid && AuthManager && AuthManager.showFieldError) {
-            AuthManager.showFieldError(input, message);
+        const validation = AuthManager.validateLoginField(fieldName, fieldValue);
+
+        if (!validation.isValid) {
+            AuthManager.showFieldError(input, validation.message);
             return false;
         }
 
@@ -103,82 +80,151 @@ class LoginManager {
     }
 
     handleSubmit(e) {
+        console.log("Login: Form submitted");
         e.preventDefault();
+
         const submitBtn = this.form.querySelector('.submit-btn');
-        
-        if (AuthManager && AuthManager.setButtonLoading) {
-            AuthManager.setButtonLoading(submitBtn, 'מתחברת...');
+        if (!submitBtn) {
+            console.error("Submit button not found");
+            return;
         }
-        
-        const formData = this.collectFormData();
-        
-        if (this.validateLoginForm(formData)) {
+
+        // איסוף נתוני הטופס
+        const formData = AuthManager.collectFormData(this.form);
+        console.log("Login: Form data collected", formData);
+
+        // בדיקת תקינות הטופס
+        const validation = AuthManager.validateLoginForm(formData);
+        if (!validation.isValid) {
+            console.log("Login: Form validation failed", validation.errors);
+            AuthManager.showFormErrors(this.form, validation.errors);
+            return;
+        }
+
+        // הצגת טקסט טעינה
+        console.log("Login: Setting loading state");
+        this.setButtonLoading(submitBtn, 'מתחברת...');
+
+        // עיבוד ההתחברות
+        setTimeout(() => {
             this.processLogin(formData, submitBtn);
-        } else {
-            if (AuthManager && AuthManager.resetButton) {
-                AuthManager.resetButton(submitBtn);
+        }, 50);
+    }
+
+    setButtonLoading(button, loadingText) {
+        if (button) {
+            button.disabled = true;
+            button.dataset.originalText = button.textContent;
+            button.textContent = loadingText;
+            button.classList.add('loading');
+            console.log("Button set to loading:", loadingText);
+        }
+    }
+
+    resetButton(button) {
+        if (button) {
+            button.disabled = false;
+            button.textContent = button.dataset.originalText || 'התחברי';
+            button.classList.remove('loading');
+            console.log("Button reset");
+        }
+    }
+
+    processLogin(loginData, submitBtn) {
+        console.log("Login: Processing login for", loginData.email);
+
+        let fxhr = new FXMLHttpRequest();
+
+        fxhr.addEventListener('onReadyStateChange', (e) => {
+            this.onReadyStateChange(e, submitBtn);
+        });
+
+        fxhr.open('POST', "https://fake.server/api/Users-Servers/login?method=POST");
+        console.log('Login: Sending login data:', loginData);
+        fxhr.send(loginData);
+        console.log('Login request sent asynchronously');
+    }
+
+    onReadyStateChange(e, submitBtn) {
+        console.log("Login: State changed to:", e.target.state);
+        let fxhr = e.target;
+
+        if (fxhr.state === 4) {
+            console.log("Login: Request completed, response:", fxhr.response);
+
+            try {
+                let response = fxhr.response;
+                if (typeof response === 'string') {
+                    response = JSON.parse(response);
+                }
+
+                if (response && response.success) {
+                    console.log("Login: Login successful");
+                    this.handleSuccessfulLogin(submitBtn, response);
+                } else {
+                    console.error("Login: Login failed:", response);
+                    this.resetButton(submitBtn);
+                    const errorMsg = response?.error || 'שגיאה בהתחברות. אנא בדקי את הפרטים ונסי שוב.';
+
+                    if (response?.error === 'User not found') {
+                        alert('משתמש לא נמצא. אנא בדקי את כתובת המייל או הירשמי.');
+                    } else if (response?.error === 'Invalid password') {
+                        alert('סיסמה שגויה. אנא נסי שוב.');
+                    } else {
+                        alert(errorMsg);
+                    }
+                }
+            } catch (error) {
+                console.error("Login: Error parsing response:", error);
+                this.resetButton(submitBtn);
+                alert('אירעה שגיאה בעיבוד התגובה. אנא נסי שוב.');
             }
         }
     }
 
-    collectFormData() {
-        const formData = new FormData(this.form);
-        return {
-            email: formData.get('email'),
-            password: formData.get('password')
+    handleSuccessfulLogin(submitBtn, response) {
+        console.log("Login: Handling successful login");
+
+        // שמירה ב-sessionStorage
+        const userData = {
+            id: response.data?.id || response.id,
+            email: response.data?.email || response.email,
+            firstName: response.data?.firstName,
+            lastName: response.data?.lastName
         };
-    }
 
-    validateLoginForm(formData) {
-        let isValid = true;
-        
-        // ולידציה בסיסית
-        if (!formData.email || !formData.password) {
-            isValid = false;
-            console.log('Missing required fields');
-        }
-        
-        return isValid;
-    }
+        sessionStorage.setItem('currentUser', JSON.stringify(userData));
+        console.log("User data saved to sessionStorage:", userData);
 
-    processLogin(userData, submitBtn) {
-        // כאן תטפלי בכניסה בפועל
-        // לדוגמה: שליחה לשרת, בדיקת פרטי התחברות וכו'
-        
-        console.log('Login attempt with:', userData);
-        
-        setTimeout(() => {
-            this.handleSuccessfulLogin(submitBtn);
-        }, 1500);
-    }
+        // הצגת הודעת הצלחה
+        alert('התחברת בהצלחה! ברוכה השבה 💖');
 
-    handleSuccessfulLogin(submitBtn) {
-        if (AuthManager && AuthManager.showSuccessMessage) {
-            AuthManager.showSuccessMessage(
-                this.form, 
-                'התחברת בהצלחה! ברוכה השבה 💖'
-            );
-        }
-        
+        // ניקוי הטופס
         this.form.reset();
-        
-        if (AuthManager && AuthManager.resetButton) {
-            AuthManager.resetButton(submitBtn);
-        }
-        
+        AuthManager.clearFormErrors(this.form);
+        this.resetButton(submitBtn);
+
+        // מעבר לדף הבית
         setTimeout(() => {
-            alert('ברוכה השבה! כעת תועברי לעמוד הבית של הקבוצה');
-            // כאן תוכלי להעביר למסך הראשי של האפליקציה
-        }, 2000);
+            console.log("Switching to diary page");
+            switchPage('diary');
+        }, 1000);
     }
 
     resetForm() {
         if (this.form) {
             this.form.reset();
-            if (AuthManager && AuthManager.clearFormErrors) {
-                AuthManager.clearFormErrors(this.form);
-            }
+            AuthManager.clearFormErrors(this.form);
         }
+    }
+
+    isFormValid() {
+        if (!this.form) return false;
+
+        const formData = AuthManager.collectFormData(this.form);
+        const validation = AuthManager.validateLoginForm(formData);
+
+        return validation.isValid;
     }
 }
 

@@ -32,7 +32,7 @@ class UserServer extends Server {
                             status: 400
                         };
                     }
-                    
+
                     const user = this.usersDB.read(email);
                     if (user) {
                         return {
@@ -80,7 +80,6 @@ class UserServer extends Server {
                         };
                     }
 
-                    // השינוי: טיפול טוב יותר בנתוני המשתמש
                     let userData;
                     if (typeof data === 'string') {
                         userData = JSON.parse(data);
@@ -93,7 +92,7 @@ class UserServer extends Server {
                             status: 400
                         };
                     }
-                    
+
                     if (!userData.email || !userData.password) {
                         return {
                             success: false,
@@ -103,28 +102,25 @@ class UserServer extends Server {
                     }
 
                     // בדיקה אם המשתמש כבר קיים
-                    try {
-                        const existingUser = this.usersDB.read(userData.email);
-                        if (existingUser) {
-                            return {
-                                success: false,
-                                error: "User already exists",
-                                status: 409
-                            };
-                        }
-                    } catch (error) {
-                        // המשתמש לא קיים - זה טוב
+                    const existingUser = this.usersDB.read(userData.email);
+                    if (existingUser) {
+                        return {
+                            success: false,
+                            error: "User already exists",
+                            status: 409
+                        };
                     }
 
                     // רישום המשתמש
                     this.usersDB.postUser(userData);
-                    
+
                     return {
                         success: true,
                         data: {
                             id: userData.id,
                             email: userData.email,
-                            message: "User registered successfully"
+                            firstName: userData.firstName, // הוסף את השדות הנוספים
+                            lastName: userData.lastName
                         },
                         status: 201
                     };
@@ -139,7 +135,7 @@ class UserServer extends Server {
                     }
 
                     const loginData = typeof data === 'string' ? JSON.parse(data) : data;
-                    
+
                     if (!loginData.email || !loginData.password) {
                         return {
                             success: false,
@@ -195,7 +191,7 @@ class UserServer extends Server {
     put(url, data, pathParts) {
         try {
             const action = pathParts[2];
-            
+
             if (action === 'update') {
                 if (!data) {
                     return {
@@ -206,7 +202,7 @@ class UserServer extends Server {
                 }
 
                 const userData = typeof data === 'string' ? JSON.parse(data) : data;
-                
+
                 if (!userData.email) {
                     return {
                         success: false,

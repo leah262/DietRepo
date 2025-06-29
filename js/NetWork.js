@@ -8,7 +8,7 @@ class NetWork {
     }
 
     sendRequest(httpRequest, callback) {
-
+        // ... הקוד הקיים עד לחלק של setTimeout
         console.log("NetWork: Processing request for URL:", httpRequest.section.href);
         console.log("NetWork: URL pathname:", httpRequest.section.pathname);
 
@@ -25,13 +25,12 @@ class NetWork {
         let pathParts = url.pathname.split('/').filter(Boolean);
         console.log("NetWork: Path parts:", pathParts);
 
-        // השינוי: עיבוד אסינכרוני עם setTimeout
         setTimeout(() => {
             let response;
             console.log(url)
             if (pathParts.length > 1 && pathParts[1] === "Users-Servers") {
                 console.log("NetWork: Routing to UserServer");
-                response = this.userServer.handleRequest(url, httpRequest.details);
+                response = this.userServer.handleRequest(url, httpRequest.details); // שנה מdetails לbody
             } else if (pathParts.length > 1 && pathParts[1] === "Info-Server") {
                 console.log("NetWork: Routing to InfoServer");
                 response = { success: false, error: "Info server not implemented", status: 501 };
@@ -46,7 +45,7 @@ class NetWork {
 
             console.log("NetWork: Sending response:", response);
             if (callback) callback(response);
-        }, 1000); // השינוי: דיליי של שנייה כדי לדמות בקשת רשת אמיתית
+        }, 1000);
     }
 }
 

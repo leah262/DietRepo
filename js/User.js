@@ -8,7 +8,7 @@ class User{
         this.height=height;
         this.password=password;
         this.bmi=this.calculateBMI();
-        this.bmiCategory='';
+        this.bmiCategory=null;
         this.init();
     }
     init(){

@@ -67,6 +67,7 @@ body {
 .form-group {
     display: flex;
     flex-direction: column;
+    z-index: 100;
 }
 
 .form-group label {
@@ -92,7 +93,7 @@ body {
     background: white;
 }
 
-.form-group input:valid {
+.form-group input {
     border-color: #28a745;
 }
 

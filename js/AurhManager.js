@@ -181,52 +181,54 @@ class AuthManager {
     // ===== פונקציות עזר לטיפול בשגיאות UI =====
     
     showFieldError(input, message) {
-        const formGroup = input.closest('.form-group');
-        if (!formGroup) return;
+        // const formGroup = input.closest('.form-group');
+        // if (!formGroup) return;
 
-        this.hideFieldError(input);
+        // // הסרת שגיאות קודמות
+        // this.hideFieldError(input);
 
-        const errorElement = document.createElement('div');
-        errorElement.className = 'error';
-        errorElement.textContent = message;
+        // const errorElement = document.createElement('div');
+        // errorElement.className = 'error';
+        // errorElement.textContent = message;
+        // errorElement.style.display = 'block'; // תיקון: הבטחה שהשגיאה תופיע
         
-        formGroup.appendChild(errorElement);
-        formGroup.classList.add('error');
+        // formGroup.appendChild(errorElement); // תיקון: הוספה אחרי הקבוצה
+        // formGroup.classList.add('error');
     }
 
     hideFieldError(input) {
-        const formGroup = input.closest('.form-group');
-        if (!formGroup) return;
+        // const formGroup = input.closest('.form-group');
+        // if (!formGroup) return;
 
-        const errorElement = formGroup.querySelector('.error');
-        if (errorElement) {
-            errorElement.remove();
-        }
-        formGroup.classList.remove('error');
+        // // הסרת כל השגיאות בקבוצה
+        // const errorElements = formGroup.querySelectorAll('.error');
+        // errorElements.forEach(error => error.remove());
+        
+        // formGroup.classList.remove('error');
     }
 
     showFormErrors(form, errors) {
         // נקה שגיאות קודמות
-        this.clearFormErrors(form);
+        // this.clearFormErrors(form);
 
-        // הצג שגיאות חדשות
-        Object.keys(errors).forEach(fieldName => {
-            const input = form.querySelector(`[name="${fieldName}"]`) || form.querySelector(`#${fieldName}`);
-            if (input) {
-                this.showFieldError(input, errors[fieldName]);
-            } else if (fieldName === 'healthyLifestyle' || fieldName === 'privacy') {
-                // טיפול בשגיאות צ'קבוקס
-                alert(errors[fieldName]);
-            }
-        });
+        // // הצג שגיאות חדשות
+        // Object.keys(errors).forEach(fieldName => {
+        //     const input = form.querySelector(`[name="${fieldName}"]`) || form.querySelector(`#${fieldName}`);
+        //     if (input) {
+        //         this.showFieldError(input, errors[fieldName]);
+        //     } else if (fieldName === 'healthyLifestyle' || fieldName === 'privacy') {
+        //         // טיפול בשגיאות צ'קבוקס
+        //         alert(errors[fieldName]);
+        //     }
+        // });
     }
 
     clearFormErrors(form) {
-        const errorElements = form.querySelectorAll('.error');
-        errorElements.forEach(error => error.remove());
+        // const errorElements = form.querySelectorAll('.error');
+        // errorElements.forEach(error => error.remove());
         
-        const errorGroups = form.querySelectorAll('.form-group.error');
-        errorGroups.forEach(group => group.classList.remove('error'));
+        // const errorGroups = form.querySelectorAll('.form-group.error');
+        // errorGroups.forEach(group => group.classList.remove('error'));
     }
 
     // ===== פונקציות עזר נוספות =====

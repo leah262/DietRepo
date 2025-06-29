@@ -16,10 +16,16 @@ class SignUpManager {
     }
 
     bindEvents() {
-        this.setupSignUpPage();
+        // האזן לטעינת דפים
+        document.addEventListener('pageLoaded', (e) => {
+            if (e.detail.pageName === 'signUp') {
+                this.setupSignUpPage();
+            }
+        });
     }
 
     setupSignUpPage() {
+        // המתן מעט לוודא שה-DOM עודכן
         setTimeout(() => {
             this.form = document.querySelector('#signupForm');
 
@@ -50,12 +56,14 @@ class SignUpManager {
     attachFieldValidation() {
         const inputs = this.form.querySelectorAll('input');
         inputs.forEach(input => {
-            input.addEventListener('blur', () => {
-                this.validateSingleField(input);
+            input.addEventListener('focus', () => {
+                AuthManager.hideFieldError(input);
             });
 
-            input.addEventListener('input', () => {
-                AuthManager.hideFieldError(input);
+            input.addEventListener('blur', () => {
+                if (input.value.trim()) {
+                    this.validateSingleField(input);
+                }
             });
         });
     }
@@ -90,21 +98,20 @@ class SignUpManager {
             return;
         }
 
-        // השינוי: הצגת טקסט טעינה מיד
-        console.log("SignUp: Setting loading state");
-        this.setButtonLoading(submitBtn, 'רושמת...');
-
+        // איסוף נתוני הטופס
         const formData = AuthManager.collectFormData(this.form);
         console.log("SignUp: Form data collected", formData);
 
-        // השינוי: המתנה קצרה כדי לוודא שהטקסט מופיע
+        // הצגת טקסט טעינה
+        console.log("SignUp: Setting loading state");
+        this.setButtonLoading(submitBtn, 'רושמת...');
+
+        // עיבוד הרישום
         setTimeout(() => {
             this.processSignUp(formData, submitBtn);
         }, 50);
-
     }
 
-    // השינוי: הוספת פונקציה לטיפול בטקסט טעינה
     setButtonLoading(button, loadingText) {
         if (button) {
             button.disabled = true;
@@ -115,7 +122,6 @@ class SignUpManager {
         }
     }
 
-    // השינוי: הוספת פונקציה לאיפוס הכפתור
     resetButton(button) {
         if (button) {
             button.disabled = false;
@@ -131,70 +137,79 @@ class SignUpManager {
         let user = new User(userData.firstName, userData.lastName, userData.email, userData.height, userData.weight, userData.password);
         let fxhr = new FXMLHttpRequest();
 
-        fxhr.addEventListener('onReadyStateChange', this.onReadyStateChange(e))
-
+        fxhr.addEventListener('onReadyStateChange', (e) => {
+            this.onReadyStateChange(e, submitBtn);
+        });
 
         fxhr.open('POST', "https://fake.server/api/Users-Servers/register?method=POST");
         console.log('SignUp: Sending user data:', user);
         fxhr.send(user);
-        console.log('please be aasync!!!!!!!!!!!!!!!!!');
-
+        console.log('Request sent asynchronously');
     }
-    onReadyStateChange(e) {
-        console.log("SignUp: State changed to:", fxhr.state);
+
+    onReadyStateChange(e, submitBtn) {
+        console.log("SignUp: State changed to:", e.target.state);
         let fxhr = e.target;
-        // השינוי: טיפול בתגובה כשהבקשה הושלמה
+
         if (fxhr.state === 4) {
             console.log("SignUp: Request completed, response:", fxhr.response);
 
-            if (fxhr.response && fxhr.response.success) {
-                console.log("SignUp: Registration successful");
-                this.handleSuccessfulSignUp(submitBtn ,e.target);
-            } else {
-                console.error("SignUp: Registration failed:", fxhr.response);
+            try {
+                let response = fxhr.response;
+                if (typeof response === 'string') {
+                    response = JSON.parse(response);
+                }
+
+                if (response && response.success) {
+                    console.log("SignUp: Registration successful");
+                    this.handleSuccessfulSignUp(submitBtn, response);
+                } else {
+                    console.error("SignUp: Registration failed:", response);
+                    this.resetButton(submitBtn);
+                    const errorMsg = response?.error || 'אירעה שגיאה בעת הרישום. אנא נסי שוב.';
+                    alert(errorMsg);
+                }
+            } catch (error) {
+                console.error("SignUp: Error parsing response:", error);
                 this.resetButton(submitBtn);
-                // השינוי: הצגת הודעת שגיאה
-                alert('אירעה שגיאה בעת הרישום. אנא נסי שוב.');
+                alert('אירעה שגיאה בעיבוד התגובה. אנא נסי שוב.');
             }
         }
-    };
-    handleSuccessfulSignUp(submitBtn,  xhr) {
+    }
+
+    handleSuccessfulSignUp(submitBtn, response) {
         console.log("SignUp: Handling successful registration");
-        let response=xhr.response;
 
-        sessionStorage.setItem('currentUser', JSON.stringify({"id":response.id, "email": response.email}));
-        switchPage('diary')
-        // השינוי: שימוש בפונקציה המקומית במקום AuthManager
-        if (typeof AuthManager.showSuccessMessage === 'function') {
-            AuthManager.showSuccessMessage(
-                this.form,
-                'הרישום הושלם בהצלחה! ברוכה הבאה לקבוצה שלנו 💖'
-            );
-        } else {
-            // אם אין AuthManager, נציג הודעה פשוטה
-            alert('הרישום הושלם בהצלחה! ברוכה הבאה לקבוצה שלנו 💖');
-        }
+        // שמירה ב-sessionStorage
+        const userData = {
+            id: response.data?.id || response.id,
+            email: response.data?.email || response.email,
+            firstName: response.data?.firstName,
+            lastName: response.data?.lastName
+        };
 
+        sessionStorage.setItem('currentUser', JSON.stringify(userData));
+        console.log("User data saved to sessionStorage:", userData);
+
+        // הצגת הודעת הצלחה
+        alert('הרישום הושלם בהצלחה! ברוכה הבאה לקבוצה שלנו 💖');
+
+        // ניקוי הטופס
         this.form.reset();
-
-        if (typeof AuthManager.clearFormErrors === 'function') {
-            AuthManager.clearFormErrors(this.form);
-        }
-
+        AuthManager.clearFormErrors(this.form);
         this.resetButton(submitBtn);
 
+        // מעבר לדף הבית
         setTimeout(() => {
-            alert('ברוכה הבאה! כעת תועברי לעמוד הבית של הקבוצה');
-            // כאן תוכלי להוסיף מעבר לעמוד הבית
-        }, 2000);
+            console.log("Switching to diary page");
+            switchPage('diary');
+        }, 1000);
     }
 
     resetForm() {
         if (this.form) {
             this.form.reset();
-            if (typeof AuthManager.clearFormErrors === 'function') {
-                AuthManager.clearFormErrors(this.form);
-            }
+            AuthManager.clearFormErrors(this.form);
         }
     }
 
@@ -211,3 +226,4 @@ class SignUpManager {
 const signUpManager = new SignUpManager();
 signUpManager.init();
 export default signUpManager;
+

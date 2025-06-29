@@ -11,7 +11,9 @@ class FXMLHttpRequest extends EventTarget {
         this.netWork = NetWork;
         this.response = null;
     }
-    
+    get responseText(){
+        return this.response;
+    }
     set state(newState) {
         this._state = newState;
         console.log(`FXMLHttpRequest: State changed to ${newState}`);
@@ -40,7 +42,7 @@ class FXMLHttpRequest extends EventTarget {
         // השינוי: שליחה אסינכרונית עם callback
         this.netWork.sendRequest(this.request, (response) => {
             console.log("FXMLHttpRequest: Response received", response);
-            this.response = response;
+            this.response = JSON.stringify(response);
             this.status = response.status || 200;
             
             // השינוי: עדכון מדורג של ה-state
@@ -53,9 +55,7 @@ class FXMLHttpRequest extends EventTarget {
         });
     }
     
-    onReadyStateChange() {
-        // נשאר ריק - האירוע נשלח דרך EventTarget
-    }
+    
     
     onError(type) {
         // נשאר ריק
