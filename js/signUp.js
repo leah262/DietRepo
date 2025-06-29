@@ -131,25 +131,8 @@ class SignUpManager {
         let user = new User(userData.firstName, userData.lastName, userData.email, userData.height, userData.weight, userData.password);
         let fxhr = new FXMLHttpRequest();
 
-        fxhr.addEventListener('onReadyStateChange', (e) => {
-            let fxhr = e.target;
-            console.log("SignUp: State changed to:", fxhr.state);
+        fxhr.addEventListener('onReadyStateChange', this.onReadyStateChange(e))
 
-            // השינוי: טיפול בתגובה כשהבקשה הושלמה
-            if (fxhr.state === 4) {
-                console.log("SignUp: Request completed, response:", fxhr.response);
-
-                if (fxhr.response && fxhr.response.success) {
-                    console.log("SignUp: Registration successful");
-                    this.handleSuccessfulSignUp(submitBtn);
-                } else {
-                    console.error("SignUp: Registration failed:", fxhr.response);
-                    this.resetButton(submitBtn);
-                    // השינוי: הצגת הודעת שגיאה
-                    alert('אירעה שגיאה בעת הרישום. אנא נסי שוב.');
-                }
-            }
-        });
 
         fxhr.open('POST', "https://fake.server/api/Users-Servers/register?method=POST");
         console.log('SignUp: Sending user data:', user);
@@ -157,10 +140,29 @@ class SignUpManager {
         console.log('please be aasync!!!!!!!!!!!!!!!!!');
 
     }
+    onReadyStateChange(e) {
+        console.log("SignUp: State changed to:", fxhr.state);
+        let fxhr = e.target;
+        // השינוי: טיפול בתגובה כשהבקשה הושלמה
+        if (fxhr.state === 4) {
+            console.log("SignUp: Request completed, response:", fxhr.response);
 
-    handleSuccessfulSignUp(submitBtn) {
+            if (fxhr.response && fxhr.response.success) {
+                console.log("SignUp: Registration successful");
+                this.handleSuccessfulSignUp(submitBtn ,e.target);
+            } else {
+                console.error("SignUp: Registration failed:", fxhr.response);
+                this.resetButton(submitBtn);
+                // השינוי: הצגת הודעת שגיאה
+                alert('אירעה שגיאה בעת הרישום. אנא נסי שוב.');
+            }
+        }
+    };
+    handleSuccessfulSignUp(submitBtn,  xhr) {
         console.log("SignUp: Handling successful registration");
-        // sessionStorage.setItem('currentUser', JSON.stringify(user))
+        let response=xhr.response;
+
+        sessionStorage.setItem('currentUser', JSON.stringify({"id":response.id, "email": response.email}));
         switchPage('diary')
         // השינוי: שימוש בפונקציה המקומית במקום AuthManager
         if (typeof AuthManager.showSuccessMessage === 'function') {
