@@ -1,22 +1,23 @@
 class DB {
     constructor() {
-        this.id=1;
+        this.id = 1;
     }
     //read/ delete/ update/post/rest api
     readAll() {
 
     }
-    deleteById(id){
+    deleteById(id) {
+        localStorage.removeItem(id);
     }
     readById(id) {
-        let theUser=JSON.parse(localStorage.getItem(id));
-        if(theUser)
+        let theUser = JSON.parse(localStorage.getItem(id));
+        if (theUser)
             return theUser;
         else
             throw new Error("object not found");
     }
-    post(data,key){
-        localStorage.setItem(key,data);        
+    post(data, key) {
+        localStorage.setItem(key, data);
     }
 }
 export default DB;

@@ -8,16 +8,13 @@ class UserServer extends Server {
         console.log("UsersServer initialized");
     }
 
-    // טיפול בבקשות GET
     get(url, pathParts) {
         try {
-            // pathParts[0] = "api", pathParts[1] = "Users-Servers", pathParts[2] = action
             const action = pathParts[2];
             const urlParams = new URLSearchParams(url.search);
 
             switch (action) {
                 case 'users':
-                    // GET /api/Users-Servers/users - קבלת כל המשתמשים
                     const allUsers = this.usersDB.readAll();
                     return {
                         success: true,
@@ -27,7 +24,6 @@ class UserServer extends Server {
                     };
 
                 case 'user':
-                    // GET /api/Users-Servers/user?email=example@email.com
                     const email = urlParams.get('email');
                     if (!email) {
                         return {
@@ -70,14 +66,12 @@ class UserServer extends Server {
         }
     }
 
-    // טיפול בבקשות POST
     post(url, data, pathParts) {
         try {
             const action = pathParts[2];
 
             switch (action) {
                 case 'register':
-                    // POST /api/Users-Servers/register
                     if (!data) {
                         return {
                             success: false,
@@ -86,8 +80,19 @@ class UserServer extends Server {
                         };
                     }
 
-                    // בדיקת נתונים נדרשים
-                    const userData = typeof data === 'string' ? JSON.parse(data) : data;
+                    // השינוי: טיפול טוב יותר בנתוני המשתמש
+                    let userData;
+                    if (typeof data === 'string') {
+                        userData = JSON.parse(data);
+                    } else if (typeof data === 'object') {
+                        userData = data;
+                    } else {
+                        return {
+                            success: false,
+                            error: "Invalid user data format",
+                            status: 400
+                        };
+                    }
                     
                     if (!userData.email || !userData.password) {
                         return {
@@ -125,7 +130,6 @@ class UserServer extends Server {
                     };
 
                 case 'login':
-                    // POST /api/Users-Servers/login
                     if (!data) {
                         return {
                             success: false,
@@ -144,7 +148,6 @@ class UserServer extends Server {
                         };
                     }
 
-                    // חיפוש המשתמש
                     const foundUser = this.usersDB.read(loginData.email);
                     if (!foundUser) {
                         return {
@@ -154,7 +157,6 @@ class UserServer extends Server {
                         };
                     }
 
-                    // בדיקת סיסמה
                     if (foundUser.password !== loginData.password) {
                         return {
                             success: false,
@@ -190,13 +192,11 @@ class UserServer extends Server {
         }
     }
 
-    // טיפול בבקשות PUT (עדכון משתמש)
     put(url, data, pathParts) {
         try {
             const action = pathParts[2];
             
             if (action === 'update') {
-                // PUT /api/Users-Servers/update
                 if (!data) {
                     return {
                         success: false,
@@ -215,7 +215,6 @@ class UserServer extends Server {
                     };
                 }
 
-                // בדיקה אם המשתמש קיים
                 const existingUser = this.usersDB.read(userData.email);
                 if (!existingUser) {
                     return {
@@ -225,7 +224,6 @@ class UserServer extends Server {
                     };
                 }
 
-                // עדכון המשתמש
                 const updatedUser = { ...existingUser, ...userData };
                 this.usersDB.post(JSON.stringify(updatedUser), existingUser.id);
 
@@ -252,14 +250,12 @@ class UserServer extends Server {
         }
     }
 
-    // טיפול בבקשות DELETE
     delete(url, pathParts) {
         try {
             const action = pathParts[2];
             const urlParams = new URLSearchParams(url.search);
 
             if (action === 'user') {
-                // DELETE /api/Users-Servers/user?email=example@email.com
                 const email = urlParams.get('email');
                 if (!email) {
                     return {
