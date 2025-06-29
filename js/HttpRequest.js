@@ -2,6 +2,7 @@ class HttpRequest {
     constructor(method, section) {
         this.method = method;
         this.section = new URL(section, "https://fake.server"); // פתרון כאן
+        this.details = null; // נאתחל ב-null
         console.log("new request:", this.method, this.section.href);
     }
 }

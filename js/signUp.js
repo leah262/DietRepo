@@ -2,6 +2,7 @@ import AuthManager from './AurhManager.js';
 import { switchPage } from './app.js';
 import User from './User.js'
 import FXMLHttpRequest from './FXMLHttpRequest.js';
+
 class SignUpManager {
     constructor() {
         this.form = null;
@@ -15,15 +16,10 @@ class SignUpManager {
     }
 
     bindEvents() {
-        // document.addEventListener('pageLoaded', (e) => {
-        //     if (e.detail.pageName === 'signUp') {
-                this.setupSignUpPage();
-        //     }
-        // });
+        this.setupSignUpPage();
     }
 
     setupSignUpPage() {
-        // המתנה קצרה לוודא שהעמוד נטען במלואו
         setTimeout(() => {
             this.form = document.querySelector('#signupForm');
             
@@ -54,12 +50,10 @@ class SignUpManager {
     attachFieldValidation() {
         const inputs = this.form.querySelectorAll('input');
         inputs.forEach(input => {
-            // בדיקה כשעוזבים את השדה
             input.addEventListener('blur', () => {
                 this.validateSingleField(input);
             });
 
-            // הסתרת שגיאות כשמתחילים להקליד
             input.addEventListener('input', () => {
                 AuthManager.hideFieldError(input);
             });
@@ -70,7 +64,6 @@ class SignUpManager {
         const fieldName = input.name;
         const fieldValue = input.value;
         
-        // אם זה שדה אישור סיסמה, צריך לקחת גם את הסיסמה המקורית
         const additionalData = {};
         if (fieldName === 'confirmPassword') {
             const passwordField = this.form.querySelector('#password');
@@ -88,59 +81,117 @@ class SignUpManager {
     }
 
     handleSubmit(e) {
-        console.log("submit");
-        
+        console.log("SignUp: Form submitted");
         e.preventDefault();
+        
         const submitBtn = this.form.querySelector('.submit-btn');
-        AuthManager.setButtonLoading(submitBtn, 'רושמת...');
+        if (!submitBtn) {
+            console.error("Submit button not found");
+            return;
+        }
+        
+        // השינוי: הצגת טקסט טעינה מיד
+        console.log("SignUp: Setting loading state");
+        this.setButtonLoading(submitBtn, 'רושמת...');
+        
         const formData = AuthManager.collectFormData(this.form);
-        const validation = AuthManager.validateSignUpForm(formData);
-                    this.processSignUp(formData, submitBtn);
-        // if (validation.isValid) {
-        //     this.processSignUp(formData, submitBtn);
-        // } else {
-        //     AuthManager.showFormErrors(this.form, validation.errors);
-        //     AuthManager.resetButton(submitBtn);
-        // }
+        console.log("SignUp: Form data collected", formData);
+        
+        // השינוי: המתנה קצרה כדי לוודא שהטקסט מופיע
+        setTimeout(() => {
+            this.processSignUp(formData, submitBtn);
+        }, 50);
+        
+    }
+
+    // השינוי: הוספת פונקציה לטיפול בטקסט טעינה
+    setButtonLoading(button, loadingText) {
+        if (button) {
+            button.disabled = true;
+            button.dataset.originalText = button.textContent;
+            button.textContent = loadingText;
+            button.classList.add('loading');
+            console.log("Button set to loading:", loadingText);
+        }
+    }
+
+    // השינוי: הוספת פונקציה לאיפוס הכפתור
+    resetButton(button) {
+        if (button) {
+            button.disabled = false;
+            button.textContent = button.dataset.originalText || 'הירשמי';
+            button.classList.remove('loading');
+            console.log("Button reset");
+        }
     }
 
     processSignUp(userData, submitBtn) {
-        // כאן תטפלי ברישום המשתמש בפועל
-        // לדוגמה: שליחה לשרת, שמירה במסד נתונים וכו'
+        console.log("SignUp: Processing registration for", userData.email);
         
-        let user =new User(userData.firstName,userData.lastName,userData.email,userData.height,userData.weight,userData.password)
-        let fxhr=new FXMLHttpRequest();
-        fxhr.addEventListener('onReadyStateChange', (e)=>{
-            let fxhr=e.target
-            console.log(fxhr.state);
-        })
-        fxhr.open('GET',"https//Users-Servers/p1")
-        console.log('User data ready for registration:', userData);
-        console.log(user);
-        fxhr.send();
+        let user = new User(userData.firstName, userData.lastName, userData.email, userData.height, userData.weight, userData.password);
+        let fxhr = new FXMLHttpRequest();
         
-        setTimeout(() => {
-            this.handleSuccessfulSignUp(submitBtn);
-        }, 1500);
+        fxhr.addEventListener('onReadyStateChange', (e) => {
+            let fxhr = e.target;
+            console.log("SignUp: State changed to:", fxhr.state);
+            
+            // השינוי: טיפול בתגובה כשהבקשה הושלמה
+            if (fxhr.state === 4) {
+                console.log("SignUp: Request completed, response:", fxhr.response);
+                
+                if (fxhr.response && fxhr.response.success) {
+                    console.log("SignUp: Registration successful");
+                    this.handleSuccessfulSignUp(submitBtn);
+                } else {
+                    console.error("SignUp: Registration failed:", fxhr.response);
+                    this.resetButton(submitBtn);
+                    // השינוי: הצגת הודעת שגיאה
+                    alert('אירעה שגיאה בעת הרישום. אנא נסי שוב.');
+                }
+            }
+        });
+        
+        fxhr.open('POST', "https://fake.server/api/Users-Servers/register?method=POST");
+        console.log('SignUp: Sending user data:', user);
+        fxhr.send(user);
+        console.log('please be aasync!!!!!!!!!!!!!!!!!');
+        
     }
 
     handleSuccessfulSignUp(submitBtn) {
-        AuthManager.showSuccessMessage(
-            this.form, 
-            'הרישום הושלם בהצלחה! ברוכה הבאה לקבוצה שלנו 💖'
-        );
+        console.log("SignUp: Handling successful registration");
+        
+        // השינוי: שימוש בפונקציה המקומית במקום AuthManager
+        if (typeof AuthManager.showSuccessMessage === 'function') {
+            AuthManager.showSuccessMessage(
+                this.form, 
+                'הרישום הושלם בהצלחה! ברוכה הבאה לקבוצה שלנו 💖'
+            );
+        } else {
+            // אם אין AuthManager, נציג הודעה פשוטה
+            alert('הרישום הושלם בהצלחה! ברוכה הבאה לקבוצה שלנו 💖');
+        }
+        
         this.form.reset();
-        AuthManager.clearFormErrors(this.form);
-        AuthManager.resetButton(submitBtn);
+        
+        if (typeof AuthManager.clearFormErrors === 'function') {
+            AuthManager.clearFormErrors(this.form);
+        }
+        
+        this.resetButton(submitBtn);
+        
         setTimeout(() => {
             alert('ברוכה הבאה! כעת תועברי לעמוד הבית של הקבוצה');
+            // כאן תוכלי להוסיף מעבר לעמוד הבית
         }, 2000);
     }
 
     resetForm() {
         if (this.form) {
             this.form.reset();
-            AuthManager.clearFormErrors(this.form);
+            if (typeof AuthManager.clearFormErrors === 'function') {
+                AuthManager.clearFormErrors(this.form);
+            }
         }
     }
 

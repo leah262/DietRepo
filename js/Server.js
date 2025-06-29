@@ -9,7 +9,9 @@ class Server {
             const method = this.extractMethod(url);
             const pathParts = url.pathname.split('/').filter(Boolean);
             
-            console.log(`Handling ${method} request for path: ${url.pathname}`);
+            console.log(`Server: Handling ${method} request for path: ${url.pathname}`);
+            console.log(`Server: Path parts:`, pathParts);
+            console.log(`Server: Data received:`, data);
             
             switch (method.toLowerCase()) {
                 case 'get':
@@ -31,12 +33,15 @@ class Server {
 
     // חילוץ method מה-URL או מ-data
     extractMethod(url) {
-        // אם יש query parameter של method
+        // השינוי: תיקון חילוץ ה-method
         const urlParams = new URLSearchParams(url.search);
-        if (urlParams.get('method')) {
-            return urlParams.get('method');
+        const methodFromParams = urlParams.get('method');
+        if (methodFromParams) {
+            console.log(`Server: Method from URL params: ${methodFromParams}`);
+            return methodFromParams;
         }
         // ברירת מחדל
+        console.log("Server: Using default method: GET");
         return 'GET';
     }
 
