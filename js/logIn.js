@@ -93,13 +93,13 @@ class LoginManager {
         const formData = AuthManager.collectFormData(this.form);
         console.log("Login: Form data collected", formData);
 
-        // בדיקת תקינות הטופס
-        const validation = AuthManager.validateLoginForm(formData);
-        if (!validation.isValid) {
-            console.log("Login: Form validation failed", validation.errors);
-            AuthManager.showFormErrors(this.form, validation.errors);
-            return;
-        }
+        // // בדיקת תקינות הטופס
+        // const validation = AuthManager.validateLoginForm(formData);
+        // if (!validation.isValid) {
+        //     console.log("Login: Form validation failed", validation.errors);
+        //     AuthManager.showFormErrors(this.form, validation.errors);
+        //     return;
+        // }
 
         // הצגת טקסט טעינה
         console.log("Login: Setting loading state");
