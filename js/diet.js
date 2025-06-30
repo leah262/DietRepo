@@ -25,7 +25,7 @@ class Diet {
         } else {
             // חכה לטעינת הדף
             document.addEventListener('pageLoaded', (e) => {
-                if (e.detail.pageName === 'diet') {
+                if (e.detail.pageName === 'diary') {
                     console.log("Diet page loaded, initializing...");
                     this.init();
                 }

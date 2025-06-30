@@ -1,4 +1,4 @@
-
+import Diet from "./diet.js";
 function init() {
     // אם אין האש, הגדר ל-signUp כברירת מחדל
     if (!location.hash || location.hash === '#') {
@@ -12,15 +12,16 @@ export function switchPage(pageName) {
     if (!pageName) return;
     // שנה את ה-hash ישירות
     location.hash = `#${pageName}`;
+    // showPage();
 }
 
 function showPage() {
     let currentPage = location.hash.substring(1);
-    // if(currentPage==='diary'){
-    //     console.log("id diet!!");
-    //        window.dietInstance = new Diet();
+    if(currentPage==='diary'){
+        console.log("id diet!!");
+           window.dietInstance = new Diet();
         
-    // }
+    }
     if (!currentPage) {
         currentPage = 'signUp'; // ברירת מחדל ל-signUp
         location.hash = '#signUp';
