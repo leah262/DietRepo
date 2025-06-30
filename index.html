@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>קבוצת נשים לדיאטה - כניסה ורישום</title>
     <link rel="stylesheet" href="./css/signUp&logIn.css">
+    <link rel="stylesheet" href="./css/dairy.css">
 </head>
 
 <body>
@@ -163,48 +164,154 @@
         </div>
     </template>
     <template id="diary">
-        <div class="container">
-            <div class="form-wrapper">
-                <div class="header">
-                    <h1>היומן האישי שלי</h1>
-                    <p>עקבי אחרי התזונה וההתקדמות שלך</p>
+        <div class="diary-container">
+            <!-- Header Section -->
+            <div class="diary-header">
+                <div class="header-content">
+                    <h1 class="diary-title">היומן האישי שלי 📝</h1>
+                    <p class="diary-subtitle">עקבי אחר התזונה וההתקדמות היומית שלך</p>
+                    <div class="user-stats">
+                        <div class="stat-card">
+                            <span class="stat-number" id="todayCalories">0</span>
+                            <span class="stat-label">קלוריות היום</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number" id="weekEntries">0</span>
+                            <span class="stat-label">רשומות השבוע</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number" id="avgCalories">0</span>
+                            <span class="stat-label">ממוצע יומי</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Entry Form -->
+            <div class="add-entry-section">
+                <div class="form-wrapper diary-form-wrapper">
+                    <div class="form-header">
+                        <h3>הוסיפי רשומה חדשה</h3>
+                    </div>
+
+                    <form id="diaryForm" class="diary-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="meal">מה אכלת?</label>
+                                <input type="text" id="meal" name="meal" placeholder="לדוגמה: סלט ירקות עם חזה עוף"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="calories">קלוריות</label>
+                                <input type="number" id="calories" name="calories" min="1" max="5000" placeholder="350"
+                                    required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="date">תאריך</label>
+                                <input type="date" id="date" name="date" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="mealType">סוג הארוחה</label>
+                                <select id="mealType" name="mealType" required>
+                                    <option value="">בחרי סוג ארוחה</option>
+                                    <option value="ארוחת בוקר">ארוחת בוקר 🌅</option>
+                                    <option value="ארוחת צהריים">ארוחת צהריים ☀️</option>
+                                    <option value="ארוחת ערב">ארוחת ערב 🌙</option>
+                                    <option value="חטיף">חטיף 🍎</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-btn add-entry-btn">
+                            <span class="btn-icon">➕</span>
+                            הוסיפי לרשימה
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Entries Display -->
+            <div class="entries-section">
+                <div class="entries-header">
+                    <h3>הרשומות שלי</h3>
+                    <div class="filter-controls">
+                        <select id="dateFilter" class="filter-select">
+                            <option value="all">כל התאריכים</option>
+                            <option value="today">היום</option>
+                            <option value="week">השבוע</option>
+                            <option value="month">החודש</option>
+                        </select>
+                        <select id="mealFilter" class="filter-select">
+                            <option value="all">כל הארוחות</option>
+                            <option value="ארוחת בוקר">ארוחת בוקר</option>
+                            <option value="ארוחת צהריים">ארוחת צהריים</option>
+                            <option value="ארוחת ערב">ארוחת ערב</option>
+                            <option value="חטיף">חטיף</option>
+                        </select>
+                    </div>
                 </div>
 
-                <form id="diaryForm" class="signup-form">
-                    <div class="form-group">
-                        <label for="meal">מה אכלת?</label>
-                        <input type="text" id="meal" name="meal" required>
+                <!-- Modern Card Layout -->
+                <div id="entriesList" class="entries-grid">
+                    <!-- Entries will be dynamically inserted here -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <div class="empty-icon">📝</div>
+                    <h3>עדיין אין רשומות</h3>
+                    <p>התחילי לעקוב אחר הארוחות שלך על ידי הוספת הרשומה הראשונה!</p>
+                </div>
+            </div>
+
+            <!-- Edit Modal -->
+            <div id="editModal" class="modal-overlay" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>עריכת רשומה</h3>
+                        <button class="close-btn" id="closeModal">&times;</button>
                     </div>
 
-                    <div class="form-row">
+                    <form id="editForm" class="modal-form">
+                        <input type="hidden" id="editId">
+
                         <div class="form-group">
-                            <label for="calories">קלוריות</label>
-                            <input type="number" id="calories" name="calories" required>
+                            <label for="editMeal">מה אכלת?</label>
+                            <input type="text" id="editMeal" name="meal" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="editCalories">קלוריות</label>
+                                <input type="number" id="editCalories" name="calories" min="1" max="5000" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="editMealType">סוג הארוחה</label>
+                                <select id="editMealType" name="mealType" required>
+                                    <option value="ארוחת בוקר">ארוחת בוקר 🌅</option>
+                                    <option value="ארוחת צהריים">ארוחת צהריים ☀️</option>
+                                    <option value="ארוחת ערב">ארוחת ערב 🌙</option>
+                                    <option value="חטיף">חטיף 🍎</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="date">תאריך</label>
-                            <input type="date" id="date" name="date" required>
+                            <label for="editDate">תאריך</label>
+                            <input type="date" id="editDate" name="date" required>
                         </div>
-                    </div>
 
-                    <button type="submit" class="submit-btn">הוסיפי לרשימה</button>
-                </form>
-
-                <div class="signup-link">
-                    <p>הרישומים שלי:</p>
-                    <table id="diaryTable">
-                        <thead>
-                            <tr>
-                                <th>תאריך</th>
-                                <th>מאכל</th>
-                                <th>קלוריות</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Entries will be inserted here by JavaScript -->
-                        </tbody>
-                    </table>
+                        <div class="modal-actions">
+                            <button type="button" class="cancel-btn" id="cancelEdit">ביטול</button>
+                            <button type="submit" class="submit-btn">שמירת שינויים</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -226,6 +333,8 @@
     <script type="module" src="./js/infoServer.js"></script>
     <script type="module" src="./js/UserServer.js"></script>
     <script type="module" src="./js/NetWork.js"></script>
+    <script type="module" src="./js/diet2.js"></script>
+
 
 </body>
 
