@@ -1,33 +1,37 @@
 import Server from './Server.js';
-import UsersDB from './UsersDB.js';
+import InfoDB from './InfoDB.js';
 
-class UserServer extends Server {
+class InfoServer extends Server {
     constructor() {
         super();
-        this.InfoDB = new UsersDB();
-        console.log("UsersServer initialized");
+        this.infoDB = new InfoDB();
+        console.log("InfoServer initialized");
     }
 
+    // GET - קבלת רשומות
     get(url, pathParts) {
         try {
-            const action = pathParts[3];
-            const urlParams = new URLSearchParams(url.search);
-            if(!action){
-                throw new error("not valid url");
+            const userId = pathParts[3]; // מהנתיב: /api/Info-Servers/records/{userId}
+            
+            if (!userId) {
+                return {
+                    success: false,
+                    error: "User ID is required",
+                    status: 400
+                };
             }
-            let userRecords=this.InfoDB.getRecordsByUserId(action);
-            if(userRecords){
-            return{
-                success:true,
-                data:userRecords,
-                status:200,
-                massege: "Records retrieved successfully"
+
+            const userRecords = this.infoDB.getRecordsByUserId(userId);
+            
+            return {
+                success: true,
+                data: userRecords,
+                status: 200,
+                message: "Records retrieved successfully"
             };
-            }
-            throw new error("id is not valid");
-            //     }
+            
         } catch (error) {
-            console.error("UsersServer GET error:", error);
+            console.error("InfoServer GET error:", error);
             return {
                 success: false,
                 error: error.message,
@@ -36,121 +40,50 @@ class UserServer extends Server {
         }
     }
 
+    // POST - הוספת רשומה חדשה
     post(url, data, pathParts) {
         try {
+            if (!data) {
+                return {
+                    success: false,
+                    error: "Record data is required",
+                    status: 400
+                };
+            }
+
+            let recordData;
+            if (typeof data === 'string') {
+                recordData = JSON.parse(data);
+            } else if (typeof data === 'object') {
+                recordData = data;
+            } else {
+                return {
+                    success: false,
+                    error: "Invalid data format",
+                    status: 400
+                };
+            }
+
+            // וולידציה בסיסית
+            if (!recordData.userId || !recordData.name || !recordData.calories) {
+                return {
+                    success: false,
+                    error: "Missing required fields: userId, name, calories",
+                    status: 400
+                };
+            }
+
+            const recordId = this.infoDB.addRecord(recordData);
             
-            // const action = pathParts[2];
-
-            // switch (action) {
-            //     case 'register':
-            //         if (!data) {
-            //             return {
-            //                 success: false,
-            //                 error: "User data is required",
-            //                 status: 400
-            //             };
-            //         }
-
-            //         let userData;
-            //         if (typeof data === 'string') {
-            //             userData = JSON.parse(data);
-            //         } else if (typeof data === 'object') {
-            //             userData = data;
-            //         } else {
-            //             return {
-            //                 success: false,
-            //                 error: "Invalid user data format",
-            //                 status: 400
-            //             };
-            //         }
-
-            //         if (!userData.email || !userData.password) {
-            //             return {
-            //                 success: false,
-            //                 error: "Email and password are required",
-            //                 status: 400
-            //             };
-            //         }
-
-            //         // בדיקה אם המשתמש כבר קיים
-            //         const existingUser = this.usersDB.read(userData.email);
-            //         if (existingUser) {
-            //             return {
-            //                 success: false,
-            //                 error: "User already exists",
-            //                 status: 409
-            //             };
-            //         }
-
-            //         // רישום המשתמש
-            //         this.usersDB.postUser(userData);
-
-            //         return {
-            //             success: true,
-            //             data: {
-            //                 id: userData.id,
-            //                 email: userData.email,
-            //                 firstName: userData.firstName, // הוסף את השדות הנוספים
-            //                 lastName: userData.lastName
-            //             },
-            //             status: 201
-            //         };
-
-            //     case 'login':
-            //         if (!data) {
-            //             return {
-            //                 success: false,
-            //                 error: "Login data is required",
-            //                 status: 400
-            //             };
-            //         }
-
-            //         const loginData = typeof data === 'string' ? JSON.parse(data) : data;
-
-            //         if (!loginData.email || !loginData.password) {
-            //             return {
-            //                 success: false,
-            //                 error: "Email and password are required",
-            //                 status: 400
-            //             };
-            //         }
-
-            //         const foundUser = this.usersDB.read(loginData.email);
-            //         if (!foundUser) {
-            //             return {
-            //                 success: false,
-            //                 error: "User not found",
-            //                 status: 404
-            //             };
-            //         }
-
-            //         if (foundUser.password !== loginData.password) {
-            //             return {
-            //                 success: false,
-            //                 error: "Invalid password",
-            //                 status: 401
-            //             };
-            //         }
-
-            //         return {
-            //             success: true,
-            //             data: {
-            //                 id: foundUser.id,
-            //                 email: foundUser.email,
-            //                 message: "Login successful"
-            //             },
-            //             status: 200
-            //         };
-
-            //     default:
-            //         return {
-            //             success: false,
-            //             error: `Action '${action}' not found`,
-            //             status: 404
-            //         };
-            // }
+            return {
+                success: true,
+                data: { id: recordId, ...recordData },
+                status: 201,
+                message: "Record added successfully"
+            };
+            
         } catch (error) {
-            console.error("UsersServer POST error:", error);
+            console.error("InfoServer POST error:", error);
             return {
                 success: false,
                 error: error.message,
@@ -159,56 +92,61 @@ class UserServer extends Server {
         }
     }
 
+    // PUT - עדכון רשומה
     put(url, data, pathParts) {
         try {
-            const action = pathParts[2];
-
-            if (action === 'update') {
-                if (!data) {
-                    return {
-                        success: false,
-                        error: "User data is required",
-                        status: 400
-                    };
-                }
-
-                const userData = typeof data === 'string' ? JSON.parse(data) : data;
-
-                if (!userData.email) {
-                    return {
-                        success: false,
-                        error: "Email is required for update",
-                        status: 400
-                    };
-                }
-
-                const existingUser = this.usersDB.read(userData.email);
-                if (!existingUser) {
-                    return {
-                        success: false,
-                        error: "User not found",
-                        status: 404
-                    };
-                }
-
-                const updatedUser = { ...existingUser, ...userData };
-                this.usersDB.post(JSON.stringify(updatedUser), existingUser.id);
-
+            const recordId = pathParts[3]; // מהנתיב: /api/Info-Servers/records/{recordId}
+            
+            if (!recordId) {
                 return {
-                    success: true,
-                    data: updatedUser,
-                    status: 200,
-                    message: "User updated successfully"
+                    success: false,
+                    error: "Record ID is required",
+                    status: 400
                 };
             }
 
+            if (!data) {
+                return {
+                    success: false,
+                    error: "Updated data is required",
+                    status: 400
+                };
+            }
+
+            let updateData;
+            if (typeof data === 'string') {
+                updateData = JSON.parse(data);
+            } else if (typeof data === 'object') {
+                updateData = data;
+            } else {
+                return {
+                    success: false,
+                    error: "Invalid data format",
+                    status: 400
+                };
+            }
+
+            // בדיקה שהרשומה קיימת
+            const existingRecord = this.infoDB.getRecord(recordId);
+            if (!existingRecord) {
+                return {
+                    success: false,
+                    error: "Record not found",
+                    status: 404
+                };
+            }
+
+            const updatedRecord = this.infoDB.updateRecord(recordId, updateData);
+            
             return {
-                success: false,
-                error: `Action '${action}' not found`,
-                status: 404
+                success: true,
+                data: updatedRecord,
+                status: 200,
+                message: "Record updated successfully"
             };
+            
         } catch (error) {
-            console.error("UsersServer PUT error:", error);
+            console.error("InfoServer PUT error:", error);
             return {
                 success: false,
                 error: error.message,
@@ -217,46 +155,56 @@ class UserServer extends Server {
         }
     }
 
-    delete(url, pathParts) {
+    // DELETE - מחיקת רשומה
+    delete(url, data, pathParts) {
         try {
-            const action = pathParts[2];
-            const urlParams = new URLSearchParams(url.search);
-
-            if (action === 'user') {
-                const email = urlParams.get('email');
-                if (!email) {
-                    return {
-                        success: false,
-                        error: "Email parameter is required",
-                        status: 400
-                    };
-                }
-
-                const user = this.usersDB.read(email);
-                if (!user) {
-                    return {
-                        success: false,
-                        error: "User not found",
-                        status: 404
-                    };
-                }
-
-                this.usersDB.deleteById(user.id);
-
+            const recordId = pathParts[3]; // מהנתיב: /api/Info-Servers/records/{recordId}
+            
+            if (!recordId) {
                 return {
-                    success: true,
-                    message: "User deleted successfully",
-                    status: 200
+                    success: false,
+                    error: "Record ID is required",
+                    status: 400
                 };
             }
 
-            return {
-                success: false,
-                error: `Action '${action}' not found`,
-                status: 404
-            };
+            // קבלת userId מהדאטה או מהרשומה הקיימת
+            let userId;
+            if (data && data.userId) {
+                userId = data.userId;
+            } else {
+                const existingRecord = this.infoDB.getRecord(recordId);
+                if (existingRecord) {
+                    userId = existingRecord.userId;
+                }
+            }
+
+            if (!userId) {
+                return {
+                    success: false,
+                    error: "User ID is required for deletion",
+                    status: 400
+                };
+            }
+
+            const success = this.infoDB.deleteRecord(recordId, userId);
+            
+            if (success) {
+                return {
+                    success: true,
+                    status: 200,
+                    message: "Record deleted successfully"
+                };
+            } else {
+                return {
+                    success: false,
+                    error: "Failed to delete record",
+                    status: 500
+                };
+            }
+            
         } catch (error) {
-            console.error("UsersServer DELETE error:", error);
+            console.error("InfoServer DELETE error:", error);
             return {
                 success: false,
                 error: error.message,
@@ -264,6 +212,6 @@ class UserServer extends Server {
             };
         }
     }
-
 }
+
 export default InfoServer;

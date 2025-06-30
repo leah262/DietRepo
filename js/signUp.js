@@ -187,7 +187,8 @@ class SignUpManager {
             firstName: response.data?.firstName,
             lastName: response.data?.lastName
         };
-
+        console.log(userData);
+        
         sessionStorage.setItem('currentUser', JSON.stringify(userData));
         console.log("User data saved to sessionStorage:", userData);
 

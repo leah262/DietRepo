@@ -1,6 +1,7 @@
 import FXMLHttpRequest from "./FXMLHttpRequest.js";
 import DietUI from "./diet2.js";
-
+console.log("loadeddddd");
+// import { switchPage } from './app.js';
 class Diet {
     constructor() {
         this.userId = JSON.parse(sessionStorage.getItem('currentUser')).id;
@@ -11,38 +12,90 @@ class Diet {
             meal: 'all'
         };
         this.ui = new DietUI(this);
+        console.log("userId",this.userId);
+        
+        // הוסף event listener לטעינת הדף
+        this.initWhenReady();
+    }
+
+    initWhenReady() {
+        // בדוק אם הדף כבר נטען
+        if (document.getElementById('diaryForm')) {
+            this.init();
+        } else {
+            // חכה לטעינת הדף
+            document.addEventListener('pageLoaded', (e) => {
+                if (e.detail.pageName === 'diet') {
+                    console.log("Diet page loaded, initializing...");
+                    this.init();
+                }
+            });
+        }
     }
 
     init() {
+        console.log("Diet init called");
         this.loadEntries();
         this.setupEventListeners();
         this.setTodaysDate();
     }
 
     setupEventListeners() {
-        // Form submission
-        document.getElementById('diaryForm').addEventListener('submit', this.handleAddEntry.bind(this));
+        console.log("Setting up event listeners");
         
+        // Form submission - בדוק שהאלמנט קיים
+        const diaryForm = document.getElementById('diaryForm');
+        if (diaryForm) {
+            diaryForm.addEventListener('submit', this.handleAddEntry.bind(this));
+            console.log("Form event listener added");
+        } else {
+            console.error("diaryForm not found!");
+        }
+
         // Filters
-        document.getElementById('dateFilter').addEventListener('change', this.handleDateFilter.bind(this));
-        document.getElementById('mealFilter').addEventListener('change', this.handleMealFilter.bind(this));
+        const dateFilter = document.getElementById('dateFilter');
+        if (dateFilter) {
+            dateFilter.addEventListener('change', this.handleDateFilter.bind(this));
+        }
         
+        const mealFilter = document.getElementById('mealFilter');
+        if (mealFilter) {
+            mealFilter.addEventListener('change', this.handleMealFilter.bind(this));
+        }
+
         // Modal events
-        document.getElementById('closeModal').addEventListener('click', this.closeModal.bind(this));
-        document.getElementById('cancelEdit').addEventListener('click', this.closeModal.bind(this));
-        document.getElementById('editForm').addEventListener('submit', this.handleEditEntry.bind(this));
+        const closeModal = document.getElementById('closeModal');
+        if (closeModal) {
+            closeModal.addEventListener('click', this.closeModal.bind(this));
+        }
         
+        const cancelEdit = document.getElementById('cancelEdit');
+        if (cancelEdit) {
+            cancelEdit.addEventListener('click', this.closeModal.bind(this));
+        }
+        
+        const editForm = document.getElementById('editForm');
+        if (editForm) {
+            editForm.addEventListener('submit', this.handleEditEntry.bind(this));
+        }
+
         // Close modal on outside click
-        document.getElementById('editModal').addEventListener('click', (e) => {
-            if (e.target.id === 'editModal') {
-                this.closeModal();
-            }
-        });
+        const editModal = document.getElementById('editModal');
+        if (editModal) {
+            editModal.addEventListener('click', (e) => {
+                if (e.target.id === 'editModal') {
+                    this.closeModal();
+                }
+            });
+        }
     }
 
     setTodaysDate() {
         const today = new Date().toISOString().split('T')[0];
-        document.getElementById('date').value = today;
+        const dateInput = document.getElementById('date');
+        if (dateInput) {
+            dateInput.value = today;
+        }
     }
 
     loadEntries() {
@@ -59,7 +112,7 @@ class Diet {
         if (fxhr.state === 4) {
             const response = JSON.parse(fxhr.responseText);
             console.log("Load response:", response);
-            
+
             if (response && response.success) {
                 this.entries = response.data || [];
                 this.ui.renderEntries();
@@ -72,8 +125,10 @@ class Diet {
     }
 
     handleAddEntry(e) {
+        console.log("handleAddEntry called");
         e.preventDefault();
-        
+        console.log("preventDefault called");
+
         const formData = new FormData(e.target);
         const entry = {
             name: formData.get('meal'),
@@ -84,6 +139,8 @@ class Diet {
             timestamp: new Date().toISOString()
         };
 
+        console.log("Entry data:", entry);
+
         // Validate entry
         if (!this.validateEntry(entry)) {
             return;
@@ -93,7 +150,7 @@ class Diet {
     }
 
     validateEntry(entry) {
-        if (!entry.name.trim()) {
+        if (!entry.name || !entry.name.trim()) {
             this.ui.showError('נא להזין שם מאכל');
             return false;
         }
@@ -113,9 +170,10 @@ class Diet {
     }
 
     addEntryToServer(entry) {
+        console.log("Sending entry to server:", entry);
         const fxhr = new FXMLHttpRequest();
         fxhr.addEventListener('onReadyStateChange', this.handleAddResponse.bind(this));
-        fxhr.open('POST', 'https://fake.server/api/Info-Servers/records');
+        fxhr.open('POST', 'https://fake.server/api/Info-Servers/records?method=POST');
         fxhr.send(entry);
     }
 
@@ -124,10 +182,13 @@ class Diet {
         if (fxhr.state === 4) {
             const response = JSON.parse(fxhr.responseText);
             console.log("Add response:", response);
-            
+
             if (response && response.success) {
                 this.ui.showSuccess('הרשומה נוספה בהצלחה! 🎉');
-                document.getElementById('diaryForm').reset();
+                const form = document.getElementById('diaryForm');
+                if (form) {
+                    form.reset();
+                }
                 this.setTodaysDate();
                 this.loadEntries(); // Reload to get updated data
             } else {
@@ -139,7 +200,7 @@ class Diet {
 
     handleEditEntry(e) {
         e.preventDefault();
-        
+
         const formData = new FormData(e.target);
         const updatedEntry = {
             id: this.currentEditId,
@@ -160,7 +221,7 @@ class Diet {
     updateEntryOnServer(entry) {
         const fxhr = new FXMLHttpRequest();
         fxhr.addEventListener('onReadyStateChange', this.handleUpdateResponse.bind(this));
-        fxhr.open('PUT', `https://fake.server/api/Info-Servers/records/${entry.id}`);
+        fxhr.open('PUT', `https://fake.server/api/Info-Servers/records/${entry.id}?method=PUT`);
         fxhr.send(entry);
     }
 
@@ -169,7 +230,7 @@ class Diet {
         if (fxhr.state === 4) {
             const response = JSON.parse(fxhr.responseText);
             console.log("Update response:", response);
-            
+
             if (response && response.success) {
                 this.ui.showSuccess('הרשומה עודכנה בהצלחה! ✨');
                 this.closeModal();
@@ -185,7 +246,7 @@ class Diet {
         if (confirm('את בטוחה שאת רוצה למחוק את הרשומה הזו?')) {
             const fxhr = new FXMLHttpRequest();
             fxhr.addEventListener('onReadyStateChange', this.handleDeleteResponse.bind(this));
-            fxhr.open('DELETE', `https://fake.server/api/Info-Servers/records/${entryId}`);
+            fxhr.open('DELETE', `https://fake.server/api/Info-Servers/records/${entryId}?method=DELETE`);
             fxhr.send({ id: entryId, userId: this.userId });
         }
     }
@@ -195,7 +256,7 @@ class Diet {
         if (fxhr.state === 4) {
             const response = JSON.parse(fxhr.responseText);
             console.log("Delete response:", response);
-            
+
             if (response && response.success) {
                 this.ui.showSuccess('הרשומה נמחקה בהצלחה! 🗑️');
                 this.loadEntries();
@@ -220,9 +281,15 @@ class Diet {
     }
 
     closeModal() {
-        document.getElementById('editModal').style.display = 'none';
+        const modal = document.getElementById('editModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
         this.currentEditId = null;
-        document.getElementById('editForm').reset();
+        const editForm = document.getElementById('editForm');
+        if (editForm) {
+            editForm.reset();
+        }
     }
 
     handleDateFilter(e) {

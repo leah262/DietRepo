@@ -1,10 +1,10 @@
 import UserServer from "./UserServer.js";
-// import  InfoServer from "./infoServer.js";
+import InfoServer from "./infoServer.js";
 
 class NetWork {
     constructor() {
         this.userServer = new UserServer();
-        // this.infoServer = new FilmsServer();
+        this.infoServer = new InfoServer(); // הוסף את השורה הזו
     }
 
     sendRequest(httpRequest, callback) {
@@ -31,9 +31,10 @@ class NetWork {
             if (pathParts.length > 1 && pathParts[1] === "Users-Servers") {
                 console.log("NetWork: Routing to UserServer");
                 response = this.userServer.handleRequest(url, httpRequest.details); // שנה מdetails לbody
-            } else if (pathParts.length > 1 && pathParts[1] === "Info-Server") {
+            } else if (pathParts.length > 1 && pathParts[1] === "Info-Servers") {
                 console.log("NetWork: Routing to InfoServer");
-                response = { success: false, error: "Info server not implemented", status: 501 };
+                response = this.infoServer.handleRequest(url, httpRequest.details);
+
             } else {
                 console.log("NetWork: No matching server found");
                 response = {
