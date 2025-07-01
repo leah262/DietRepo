@@ -1,24 +1,10 @@
 class DB {
-    constructor() {
-        this.init();
-    }
-
-    init() {
-        // אתחול מונה ה-ID
-        if (!localStorage.getItem('dbCounter')) {
-            localStorage.setItem('dbCounter', '1');
-        }
-    }
-
     get id() {
         return parseInt(localStorage.getItem('dbCounter')) || 1;
     }
-
     set id(value) {
         localStorage.setItem('dbCounter', value.toString());
     }
-
-    // שמירת נתונים
     post(data, id = null) {
         try {
             const recordId = id || this.id;
@@ -35,8 +21,6 @@ class DB {
             throw error;
         }
     }
-
-    // קריאת נתונים לפי ID
     readById(id) {
         try {
             const data = localStorage.getItem(id.toString());
@@ -46,8 +30,6 @@ class DB {
             return null;
         }
     }
-
-    // מחיקת נתונים לפי ID
     deleteById(id) {
         try {
             localStorage.removeItem(id.toString());
@@ -58,8 +40,6 @@ class DB {
             return false;
         }
     }
-
-    // מחיקת כל הנתונים
     clearAll() {
         try {
             localStorage.clear();
@@ -72,5 +52,4 @@ class DB {
         }
     }
 }
-
 export default DB;

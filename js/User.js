@@ -9,11 +9,6 @@ class User{
         this.password=password;
         this.bmi=this.calculateBMI();
         this.bmiCategory=null;
-        this.init();
-    }
-    init(){
-        // let fxhr=new FXHRLHttpRequest();
-        //writing to db
     }
         calculateBMI() {
         if (this.weight && this.height) {

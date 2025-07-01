@@ -5,8 +5,9 @@ class UsersDB extends DB {
         this.init();
     }
     init() {
-        // השינוי: בדיקה אם כבר קיים כדי לא למחוק נתונים קיימים
-        if (!localStorage.getItem("userEmails&Id")) {
+    if (!localStorage.getItem('dbCounter')) {
+            localStorage.setItem('dbCounter', '1');
+        }        if (!localStorage.getItem("userEmails&Id")) {
             localStorage.setItem("userEmails&Id", JSON.stringify([]));
         }
     }
@@ -33,11 +34,7 @@ class UsersDB extends DB {
         this.id++;
         let usersEmail = JSON.parse(localStorage.getItem("userEmails&Id"));
         usersEmail.push({ id: this.id - 1, email: user.email });
-        
-        // השינוי: תיקון שמירת רשימת האימיילים
         localStorage.setItem("userEmails&Id", JSON.stringify(usersEmail));
-        
-        // השינוי: תיקון השמירה - הסרת הקריאה הכפולה
         this.post(JSON.stringify(user), this.id - 1);
     }
 }
