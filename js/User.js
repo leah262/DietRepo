@@ -18,7 +18,6 @@ class User{
             else if (bmi < 25) this.bmiCategory = 'משקל תקין';
             else if (bmi < 30) this.bmiCategory = 'עודף משקל';
             else this.bmiCategory = 'השמנת יתר!!';
-            return bmi;
         }
     }
 
