@@ -132,13 +132,10 @@ class LoginManager {
 
     processLogin(loginData, submitBtn) {
         console.log("Login: Processing login for", loginData.email);
-
         let fxhr = new FXMLHttpRequest();
-
         fxhr.addEventListener('onReadyStateChange', (e) => {
             this.onReadyStateChange(e, submitBtn);
         });
-
         fxhr.open('POST', "https://fake.server/api/Users-Servers/login?method=POST");
         console.log('Login: Sending login data:', loginData);
         fxhr.send(loginData);
@@ -148,16 +145,13 @@ class LoginManager {
     onReadyStateChange(e, submitBtn) {
         console.log("Login: State changed to:", e.target.state);
         let fxhr = e.target;
-
         if (fxhr.state === 4) {
             console.log("Login: Request completed, response:", fxhr.response);
-
             try {
                 let response = fxhr.response;
                 if (typeof response === 'string') {
                     response = JSON.parse(response);
                 }
-
                 if (response && response.success) {
                     console.log("Login: Login successful");
                     this.handleSuccessfulLogin(submitBtn, response);
@@ -165,7 +159,6 @@ class LoginManager {
                     console.error("Login: Login failed:", response);
                     this.resetButton(submitBtn);
                     const errorMsg = response?.error || 'שגיאה בהתחברות. אנא בדקי את הפרטים ונסי שוב.';
-
                     if (response?.error === 'User not found') {
                         alert('משתמש לא נמצא. אנא בדקי את כתובת המייל או הירשמי.');
                     } else if (response?.error === 'Invalid password') {

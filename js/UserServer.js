@@ -7,292 +7,144 @@ class UserServer extends Server {
         this.usersDB = new UsersDB();
         console.log("UsersServer initialized");
     }
-
     get(url, pathParts) {
         try {
             const action = pathParts[2];
             const urlParams = new URLSearchParams(url.search);
-
             switch (action) {
                 case 'users':
-                    const allUsers = this.usersDB.readAll();
-                    return {
-                        success: true,
-                        data: allUsers,
-                        status: 200,
-                        message: "Users retrieved successfully"
-                    };
-
+                    return this.getAllUsers();
                 case 'user':
-                    const email = urlParams.get('email');
-                    if (!email) {
-                        return {
-                            success: false,
-                            error: "Email parameter is required",
-                            status: 400
-                        };
-                    }
-
-                    const user = this.usersDB.read(email);
-                    if (user) {
-                        return {
-                            success: true,
-                            data: user,
-                            status: 200,
-                            message: "User found"
-                        };
-                    } else {
-                        return {
-                            success: false,
-                            error: "User not found",
-                            status: 404
-                        };
-                    }
-
+                    return this.getOneUser();
                 default:
-                    return {
-                        success: false,
-                        error: `Action '${action}' not found`,
-                        status: 404
-                    };
+                    return this.createResponse(false, `Action '${action}' not found`, 404, null);
             }
         } catch (error) {
             console.error("UsersServer GET error:", error);
-            return {
-                success: false,
-                error: error.message,
-                status: 500
-            };
+            return this.createResponse(false, error.message, 500, null);
         }
     }
-
+    getOneUser() {
+        const email = urlParams.get('email');
+        if (!email) {
+            return this.createResponse(false, "Email parameter is required", 400, null);
+        }
+        const user = this.usersDB.read(email);
+        if (user) {
+            return this.createResponse(true, null, 200, "User found", user);
+        } else {
+            return this.createResponse(false, "User not found", 404);
+        }
+    }
+    getAllUsers() {
+        const allUsers = this.usersDB.readAll();
+        return this.createResponse(true, null, 200, "Users retrieved successfully", allUsers);
+    }
     post(url, data, pathParts) {
         try {
             const action = pathParts[2];
-
             switch (action) {
                 case 'register':
-                    if (!data) {
-                        return {
-                            success: false,
-                            error: "User data is required",
-                            status: 400
-                        };
-                    }
-
-                    let userData;
-                    if (typeof data === 'string') {
-                        userData = JSON.parse(data);
-                    } else if (typeof data === 'object') {
-                        userData = data;
-                    } else {
-                        return {
-                            success: false,
-                            error: "Invalid user data format",
-                            status: 400
-                        };
-                    }
-
-                    if (!userData.email || !userData.password) {
-                        return {
-                            success: false,
-                            error: "Email and password are required",
-                            status: 400
-                        };
-                    }
-
-                    // בדיקה אם המשתמש כבר קיים
-                    const existingUser = this.usersDB.read(userData.email);
-                    if (existingUser) {
-                        return {
-                            success: false,
-                            error: "User already exists",
-                            status: 409
-                        };
-                    }
-
-                    // רישום המשתמש
-                    this.usersDB.postUser(userData);
-
-                    return {
-                        success: true,
-                        data: {
-                            id: userData.id,
-                            email: userData.email,
-                            firstName: userData.firstName, // הוסף את השדות הנוספים
-                            lastName: userData.lastName
-                        },
-                        status: 201
-                    };
-
+                    return this.handelSignUpRequest(action, url, data, pathParts);
                 case 'login':
-                    if (!data) {
-                        return {
-                            success: false,
-                            error: "Login data is required",
-                            status: 400
-                        };
-                    }
-
-                    const loginData = typeof data === 'string' ? JSON.parse(data) : data;
-
-                    if (!loginData.email || !loginData.password) {
-                        return {
-                            success: false,
-                            error: "Email and password are required",
-                            status: 400
-                        };
-                    }
-
-                    const foundUser = this.usersDB.read(loginData.email);
-                    if (!foundUser) {
-                        return {
-                            success: false,
-                            error: "User not found",
-                            status: 404
-                        };
-                    }
-
-                    if (foundUser.password !== loginData.password) {
-                        return {
-                            success: false,
-                            error: "Invalid password",
-                            status: 401
-                        };
-                    }
-
-                    return {
-                        success: true,
-                        data: {
-                            id: foundUser.id,
-                            email: foundUser.email,
-                            message: "Login successful"
-                        },
-                        status: 200
-                    };
-
+                    return this.handelLoginRequest(action, url, data, pathParts);
                 default:
-                    return {
-                        success: false,
-                        error: `Action '${action}' not found`,
-                        status: 404
-                    };
+                    return this.createResponse(false, `Action '${action}' not found`, 404, null);
             }
         } catch (error) {
             console.error("UsersServer POST error:", error);
-            return {
-                success: false,
-                error: error.message,
-                status: 500
-            };
+            return this.createResponse(false, error.message, 500, null);
         }
+    }
+    handelSignUpRequest(action, url, data, pathParts) {
+        if (!data) {
+            return this.createResponse(false, "User data is required", 400, null);
+        }
+        let userData;
+        if (typeof data === 'string') {
+            userData = JSON.parse(data);
+        } else if (typeof data === 'object') {
+            userData = data;
+        } else {
+            return this.createResponse(false, "Invalid user data format", 400, null)
+        }
+        if (!userData.email || !userData.password) {
+            return this.createResponse(false, "Email and password are required", 400, null);
+        }
+        const existingUser = this.usersDB.read(userData.email);
+        if (existingUser) {
+            return this.createResponse(false, "User already exists", 409, null);
+        }
+        this.usersDB.postUser(userData);
+        return this.createResponse(true, null, 201, null, userData)
+    }
+    handelLoginRequest(action, url, data, pathParts) {
+        if (!data) {
+            return this.createResponse(false, "Login data is required", 400, null);
+        }
+        const loginData = typeof data === 'string' ? JSON.parse(data) : data;
+        if (!loginData.email || !loginData.password) {
+            this.createResponse(false, "Email and password are required", 400, null);
+        }
+        const foundUser = this.usersDB.read(loginData.email);
+        if (!foundUser) {
+            return this.createResponse(false, "User not found", 404, null);
+        }
+        if (foundUser.password !== loginData.password) {
+            return this.createResponse(false, "Invalid password", 401, null);
+        }
+        return this.createResponse(true, null, 200, "Login successful", {
+            id: foundUser.id,
+            email: foundUser.email,
+        })
     }
 
     put(url, data, pathParts) {
         try {
             const action = pathParts[2];
-
             if (action === 'update') {
                 if (!data) {
-                    return {
-                        success: false,
-                        error: "User data is required",
-                        status: 400
-                    };
+                    return this.createResponse(false, "User data is required", 400, null);
                 }
-
                 const userData = typeof data === 'string' ? JSON.parse(data) : data;
-
                 if (!userData.email) {
-                    return {
-                        success: false,
-                        error: "Email is required for update",
-                        status: 400
-                    };
+                    return this.createResponse(false, "Email is required for update", 400, null);
                 }
-
                 const existingUser = this.usersDB.read(userData.email);
                 if (!existingUser) {
-                    return {
-                        success: false,
-                        error: "User not found",
-                        status: 404
-                    };
+                    return this.createResponse(false, "User not found", 404, null);
                 }
-
                 const updatedUser = { ...existingUser, ...userData };
                 this.usersDB.post(JSON.stringify(updatedUser), existingUser.id);
-
-                return {
-                    success: true,
-                    data: updatedUser,
-                    status: 200,
-                    message: "User updated successfully"
-                };
+                return this.createResponse(true, null, 200, "User updated successfully", updatedUser);
             }
-
-            return {
-                success: false,
-                error: `Action '${action}' not found`,
-                status: 404
-            };
+            return this.createResponse(false, `Action '${action}' not found`, 404, null);
         } catch (error) {
             console.error("UsersServer PUT error:", error);
-            return {
-                success: false,
-                error: error.message,
-                status: 500
-            };
+            return this.createResponse(false, error.message, 500, null);
         }
     }
-
     delete(url, pathParts) {
         try {
             const action = pathParts[2];
             const urlParams = new URLSearchParams(url.search);
-
             if (action === 'user') {
                 const email = urlParams.get('email');
                 if (!email) {
-                    return {
-                        success: false,
-                        error: "Email parameter is required",
-                        status: 400
-                    };
+                    return this.createResponse(false, "Email parameter is required", 400, null);
                 }
-
                 const user = this.usersDB.read(email);
                 if (!user) {
-                    return {
-                        success: false,
-                        error: "User not found",
-                        status: 404
-                    };
+                    return this.createResponse(false, "User not found", 404, null);
                 }
-
                 this.usersDB.deleteById(user.id);
-
-                return {
-                    success: true,
-                    message: "User deleted successfully",
-                    status: 200
-                };
+                return this.createResponse(true, null, 200, "User deleted successfully");
             }
-
-            return {
-                success: false,
-                error: `Action '${action}' not found`,
-                status: 404
-            };
+            return this.createResponse(false, `Action '${action}' not found`, 404, null);
         } catch (error) {
             console.error("UsersServer DELETE error:", error);
-            return {
-                success: false,
-                error: error.message,
-                status: 500
-            };
-        }
+            return this.createResponse(false, error.message, 500, null);
+        };
     }
 }
-
 export default UserServer;

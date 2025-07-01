@@ -153,7 +153,6 @@ class SignUpManager {
 
         if (fxhr.state === 4) {
             console.log("SignUp: Request completed, response:", fxhr.response);
-
             try {
                 let response = fxhr.response;
                 if (typeof response === 'string') {
@@ -179,8 +178,6 @@ class SignUpManager {
 
     handleSuccessfulSignUp(submitBtn, response) {
         console.log("SignUp: Handling successful registration");
-
-        // שמירה ב-sessionStorage
         const userData = {
             id: response.data?.id || response.id,
             email: response.data?.email || response.email,
@@ -188,19 +185,12 @@ class SignUpManager {
             lastName: response.data?.lastName
         };
         console.log(userData);
-        
         sessionStorage.setItem('currentUser', JSON.stringify(userData));
         console.log("User data saved to sessionStorage:", userData);
-
-        // הצגת הודעת הצלחה
         alert('הרישום הושלם בהצלחה! ברוכה הבאה לקבוצה שלנו 💖');
-
-        // ניקוי הטופס
         this.form.reset();
         AuthManager.clearFormErrors(this.form);
         this.resetButton(submitBtn);
-
-        // מעבר לדף הבית
         setTimeout(() => {
             console.log("Switching to diary page");
             switchPage('diary');
