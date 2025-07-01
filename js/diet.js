@@ -12,8 +12,8 @@ class Diet {
             meal: 'all'
         };
         this.ui = new DietUI(this);
-        console.log("userId",this.userId);
-        
+        console.log("userId", this.userId);
+
         // הוסף event listener לטעינת הדף
         this.initWhenReady();
     }
@@ -42,7 +42,7 @@ class Diet {
 
     setupEventListeners() {
         console.log("Setting up event listeners");
-        
+
         // Form submission - בדוק שהאלמנט קיים
         const diaryForm = document.getElementById('diaryForm');
         if (diaryForm) {
@@ -57,7 +57,7 @@ class Diet {
         if (dateFilter) {
             dateFilter.addEventListener('change', this.handleDateFilter.bind(this));
         }
-        
+
         const mealFilter = document.getElementById('mealFilter');
         if (mealFilter) {
             mealFilter.addEventListener('change', this.handleMealFilter.bind(this));
@@ -68,12 +68,12 @@ class Diet {
         if (closeModal) {
             closeModal.addEventListener('click', this.closeModal.bind(this));
         }
-        
+
         const cancelEdit = document.getElementById('cancelEdit');
         if (cancelEdit) {
             cancelEdit.addEventListener('click', this.closeModal.bind(this));
         }
-        
+
         const editForm = document.getElementById('editForm');
         if (editForm) {
             editForm.addEventListener('submit', this.handleEditEntry.bind(this));
@@ -244,12 +244,14 @@ class Diet {
 
     deleteEntry(entryId) {
         if (confirm('את בטוחה שאת רוצה למחוק את הרשומה הזו?')) {
+            const numericId = parseInt(entryId);
             const fxhr = new FXMLHttpRequest();
             fxhr.addEventListener('onReadyStateChange', this.handleDeleteResponse.bind(this));
-            fxhr.open('DELETE', `https://fake.server/api/Info-Servers/records/${entryId}?method=DELETE`);
-            fxhr.send({ id: entryId, userId: this.userId });
+            fxhr.open('DELETE', `https://fake.server/api/Info-Servers/records/${numericId}?method=DELETE`);
+            fxhr.send({ id: numericId, userId: this.userId });
         }
     }
+
 
     handleDeleteResponse(e) {
         const fxhr = e.target;
@@ -268,15 +270,19 @@ class Diet {
     }
 
     editEntry(entryId) {
-        const entry = this.entries.find(e => e.id === entryId);
+        // המרה לנומבר
+        const numericId = parseInt(entryId);
+        const entry = this.entries.find(e => parseInt(e.id) === numericId);
         if (entry) {
-            this.currentEditId = entryId;
-            document.getElementById('editId').value = entryId;
+            this.currentEditId = numericId;
+            document.getElementById('editId').value = numericId;
             document.getElementById('editMeal').value = entry.name;
             document.getElementById('editCalories').value = entry.calories;
             document.getElementById('editDate').value = entry.date;
             document.getElementById('editMealType').value = entry.mealType;
             document.getElementById('editModal').style.display = 'flex';
+        } else {
+            console.error('Entry not found:', entryId, 'Available entries:', this.entries);
         }
     }
 

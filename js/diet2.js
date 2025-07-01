@@ -58,22 +58,34 @@ class DietUI {
         `;
     }
 
-    setupEntryActionListeners() {
-        document.querySelectorAll('[data-action="edit"]').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const entryId = e.target.closest('[data-id]').dataset.id;
-                this.diet.editEntry(entryId);
-            });
+  // תיקון פונקציית ההתקנה של event listeners
+setupEntryActionListeners() {
+    // הסרת event listeners קיימים כדי למנוע כפילויות
+    document.querySelectorAll('[data-action="edit"]').forEach(button => {
+        // הסרת event listeners קיימים
+        button.replaceWith(button.cloneNode(true));
+    });
+    
+    document.querySelectorAll('[data-action="delete"]').forEach(button => {
+        // הסרת event listeners קיימים
+        button.replaceWith(button.cloneNode(true));
+    });
+    
+    // הוספת event listeners חדשים
+    document.querySelectorAll('[data-action="edit"]').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const entryId = parseInt(e.target.closest('[data-id]').dataset.id);
+            this.diet.editEntry(entryId);
         });
+    });
 
-        document.querySelectorAll('[data-action="delete"]').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const entryId = e.target.closest('[data-id]').dataset.id;
-                this.diet.deleteEntry(entryId);
-            });
+    document.querySelectorAll('[data-action="delete"]').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const entryId = parseInt(e.target.closest('[data-id]').dataset.id);
+            this.diet.deleteEntry(entryId);
         });
-    }
-
+    });
+}
     updateStats() {
         const entries = this.diet.getEntries();
         
