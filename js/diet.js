@@ -1,5 +1,7 @@
 import FXMLHttpRequest from "./FXMLHttpRequest.js";
 import DietUI from "./diet2.js";
+import { logout } from './app.js'; // ייבוא פונקציית ה-logout
+
 console.log("loadeddddd");
 // import { switchPage } from './app.js';
 class Diet {
@@ -38,12 +40,27 @@ class Diet {
         this.loadEntries();
         this.setupEventListeners();
         this.setTodaysDate();
+        this.editName();
+        this.setupLogoutButton(); // הוספה חדשה
     }
+
+  setupLogoutButton() {
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            if (confirm('את בטוחה שאת רוצה להתנתק?')) {
+                // נקה את הinstance הנוכחי
+                this.entries = [];
+                this.currentEditId = null;
+                // בצע logout
+                logout();
+            }
+        });
+    }
+}
 
     setupEventListeners() {
         console.log("Setting up event listeners");
-
-        // Form submission - בדוק שהאלמנט קיים
         const diaryForm = document.getElementById('diaryForm');
         if (diaryForm) {
             diaryForm.addEventListener('submit', this.handleAddEntry.bind(this));
@@ -51,24 +68,18 @@ class Diet {
         } else {
             console.error("diaryForm not found!");
         }
-
-        // Filters
         const dateFilter = document.getElementById('dateFilter');
         if (dateFilter) {
             dateFilter.addEventListener('change', this.handleDateFilter.bind(this));
         }
-
         const mealFilter = document.getElementById('mealFilter');
         if (mealFilter) {
             mealFilter.addEventListener('change', this.handleMealFilter.bind(this));
         }
-
-        // Modal events
         const closeModal = document.getElementById('closeModal');
         if (closeModal) {
             closeModal.addEventListener('click', this.closeModal.bind(this));
         }
-
         const cancelEdit = document.getElementById('cancelEdit');
         if (cancelEdit) {
             cancelEdit.addEventListener('click', this.closeModal.bind(this));
@@ -88,6 +99,13 @@ class Diet {
                 }
             });
         }
+    }
+    editName() {
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        const titleElement = document.getElementById('diary-titles');
+
+        titleElement.textContent = currentUser.firstName;
+
     }
 
     setTodaysDate() {
