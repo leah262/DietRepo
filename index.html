@@ -168,7 +168,8 @@
             <!-- Header Section -->
             <div class="diary-header">
                 <div class="header-content">
-                    <h1 class="diary-title">היומן האישי שלי 📝</h1>
+                    <h1 class="diary-title">היומן האישי של 📝</h1>
+                    <h1 id="diary-titles"></h1>
                     <p class="diary-subtitle">עקבי אחר התזונה וההתקדמות היומית שלך</p>
                     <div class="user-stats">
                         <div class="stat-card">
@@ -186,6 +187,11 @@
                     </div>
                 </div>
             </div>
+            <div class="diary-header">
+                <button id="logoutBtn" class="logout-btn">
+                    <span>🚪התנתק</span> 
+                </button>
+            </div>
 
             <!-- Add Entry Form -->
             <div class="add-entry-section">
@@ -194,7 +200,7 @@
                         <h3>הוסיפי רשומה חדשה</h3>
                     </div>
 
-                    <form id="diaryForm" class="diary-form" >
+                    <form id="diaryForm" class="diary-form">
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="meal">מה אכלת?</label>
@@ -309,7 +315,7 @@
 
                         <div class="modal-actions">
                             <button type="button" class="cancel-btn" id="cancelEdit">ביטול</button>
-                            <button type="submit"  class="submit-btn">שמירת שינויים</button>
+                            <button type="submit" class="submit-btn">שמירת שינויים</button>
                         </div>
                     </form>
                 </div>
