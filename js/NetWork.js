@@ -1,9 +1,9 @@
 import UserServer from "./UserServer.js";
-import InfoServer from "./infoServer.js";
+import InfoServer from "./InfoServer.js";
 class NetWork {
     constructor() {
-        this.userServer = new UserServer();
-        this.infoServer = new InfoServer();
+        this.userServer = UserServer;
+        this.infoServer = InfoServer;
     }
     sendRequest(httpRequest, callback) {
         console.log("NetWork: Processing request for URL:", httpRequest.section.href);

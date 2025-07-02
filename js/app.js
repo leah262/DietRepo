@@ -1,4 +1,4 @@
-import Diet from "./diet.js";
+import Diet from "./Diet.js";
 let isInDiary = false; // דגל למעקב אחר מיקום בדיארי
 function init() {
     if (!location.hash || location.hash === '#') {

@@ -1,5 +1,5 @@
 import AuthManager from './AurhManager.js';
-import { switchPage } from './app.js';
+import { switchPage } from './App.js';
 import FXMLHttpRequest from './FXMLHttpRequest.js';
 class LoginManager {
     constructor() {
@@ -83,7 +83,7 @@ class LoginManager {
         let fxhr = new FXMLHttpRequest();
         fxhr.addEventListener('onReadyStateChange', (e) => {
             console.log("in state event listner");
-          //here try around all  
+            //here try around all  
             this.onReadyStateChange(e, submitBtn);
         });
         fxhr.open('POST', "https://fake.server/api/Users-Servers/login?method=POST");

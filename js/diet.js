@@ -1,6 +1,6 @@
 import FXMLHttpRequest from "./FXMLHttpRequest.js";
-import DietUI from "./diet2.js";
-import { logout } from './app.js';
+import DietUI from "./DietUI.js";
+import { logout } from './App.js';
 
 console.log("loadeddddd");
 

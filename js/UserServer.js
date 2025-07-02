@@ -147,4 +147,4 @@ class UserServer extends Server {
         };
     }
 }
-export default UserServer;
+export default new UserServer();

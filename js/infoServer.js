@@ -80,4 +80,4 @@ class InfoServer extends Server {
     }
 }
 
-export default InfoServer;
+export default new InfoServer();

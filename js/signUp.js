@@ -1,5 +1,5 @@
 import AuthManager from './AurhManager.js';
-import { switchPage } from './app.js';
+import { switchPage } from './App.js';
 import User from './User.js'
 import FXMLHttpRequest from './FXMLHttpRequest.js';
 class SignUpManager {
