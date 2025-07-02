@@ -12,6 +12,7 @@
 <body>
     <div id="appContainer"></div>
 
+    <!-- SIGN UP TEMPLATE -->
     <template id="signUp">
         <div class="container">
             <div class="form-wrapper">
@@ -99,6 +100,8 @@
             </div>
         </div>
     </template>
+
+    <!-- LOG IN TEMPLATE -->
     <template id="login">
         <div class="container">
             <div class="form-wrapper login-form-wrapper">
@@ -162,6 +165,7 @@
     </template>
     <template id="diary">
         <div class="diary-container">
+            <!-- Header Section -->
             <div class="diary-header">
                 <div class="header-content">
                     <h1 class="diary-title">היומן האישי של 📝</h1>
@@ -185,9 +189,11 @@
             </div>
             <div class="diary-header">
                 <button id="logoutBtn" class="logout-btn">
-                    <span>🚪התנתק</span> 
+                    <span>🚪התנתק</span>
                 </button>
             </div>
+
+            <!-- Add Entry Form -->
             <div class="add-entry-section">
                 <div class="form-wrapper diary-form-wrapper">
                     <div class="form-header">
@@ -229,11 +235,13 @@
 
                         <button type="submit" class="submit-btn add-entry-btn">
                             <span class="btn-icon">➕</span>
-                            הוסיפי לרשימה
+                            לשמור?
                         </button>
                     </form>
                 </div>
             </div>
+
+            <!-- Entries Display -->
             <div class="entries-section">
                 <div class="entries-header">
                     <h3>הרשומות שלי</h3>
@@ -253,7 +261,10 @@
                         </select>
                     </div>
                 </div>
+
+                <!-- Modern Card Layout -->
                 <div id="entriesList" class="entries-grid">
+                    <!-- Entries will be dynamically inserted here -->
                 </div>
 
                 <!-- Empty State -->
@@ -320,14 +331,21 @@
     <script type="module" src="./js/FXMLHttpRequest.js"></script>
     <script type="module" src="./js/HttpRequest.js"></script>
     <script type="module" src="./js/DB.js"></script>
-    <script type="module" src="./js/diet.js"></script>
     <script type="module" src="./js/InfoDB.js"></script>
     <script type="module" src="./js/UsersDB.js"></script>
     <script type="module" src="./js/Server.js"></script>
     <script type="module" src="./js/infoServer.js"></script>
     <script type="module" src="./js/UserServer.js"></script>
     <script type="module" src="./js/NetWork.js"></script>
-    <script type="module" src="./js/diet2.js"></script>
+    <script type="module" src="./js/DietActions.js"></script>
+    <script type="module" src="./js/DietAPI.js"></script>
+    <script type="module" src="./js/DietCore.js"></script>
+    <script type="module" src="./js/DietNotifications.js"></script>
+    <script type="module" src="./js/DietRenderer.js"></script>
+
+
+
+
 
 
 </body>

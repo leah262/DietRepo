@@ -1,10 +1,11 @@
-import Diet from "./Diet.js";
+import DietCore from "./DietCore.js";
 let isInDiary = false; // דגל למעקב אחר מיקום בדיארי
 function init() {
     if (!location.hash || location.hash === '#') {
         location.hash = '#signUp';
         return;
     }
+    loadListeners();
     showPage();
 }
 export function switchPage(pageName) {
@@ -20,7 +21,7 @@ export function logout() {
     window.onpopstate = function () {
         if (!blockedBack) {
             blockedBack = true;
-            history.go(1); 
+            history.go(1);
         }
     };
     showPage();
@@ -29,7 +30,7 @@ function showPage() {
     let currentPage = location.hash.substring(1);
     if (currentPage === 'diary') {
         console.log("id diet!!");
-        window.dietInstance = new Diet();
+        window.dietInstance = new DietCore();
         isInDiary = true;
         history.replaceState(null, null, '#diary');
     } else {
@@ -57,21 +58,22 @@ function theMainArea(currentPage) {
         detail: { pageName: currentPage }
     }));
 }
-//in functions init
-window.addEventListener('hashchange', (e) => {
-    if (isInDiary && !location.hash.includes('diary')) {
-        e.preventDefault();
-        location.hash = '#diary';
-        alert('לא ניתן לחזור אחורה. השתמש בכפתור "התנתק" כדי לצאת.');
-        return;
-    }
-    showPage();
-});
-window.addEventListener('popstate', (e) => {
-    if (isInDiary) {
-        history.pushState({ page: 'diary' }, '', '#diary');
-        alert('לא ניתן לחזור אחורה. השתמש בכפתור "התנתק" כדי לצאת.');
-        return;
-    }
-});
+function loadListeners(){
+    window.addEventListener('hashchange', (e) => {
+        if (isInDiary && !location.hash.includes('diary')) {
+            e.preventDefault();
+            location.hash = '#diary';
+            alert('לא ניתן לחזור אחורה. השתמש בכפתור "התנתק" כדי לצאת.');
+            return;
+        }
+        showPage();
+    });
+    window.addEventListener('popstate', (e) => {
+        if (isInDiary) {
+            history.pushState({ page: 'diary' }, '', '#diary');
+            alert('לא ניתן לחזור אחורה. השתמש בכפתור "התנתק" כדי לצאת.');
+            return;
+        }
+    });
+}
 init();

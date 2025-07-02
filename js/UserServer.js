@@ -71,10 +71,6 @@ class UserServer extends Server {
         if (!userData.email || !userData.password) {
             return this.createResponse(false, "Email and password are required", 400, null);
         }
-        const existingUser = this.usersDB.read(userData.email);
-        if (existingUser) {
-            return this.createResponse(false, "User already exists", 409, null);
-        }
         this.usersDB.postUser(userData);
         return this.createResponse(true, null, 201, null, userData)
     }
