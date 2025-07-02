@@ -5,7 +5,7 @@ class DB {
     set id(value) {
         localStorage.setItem('dbCounter', value.toString());
     }
-    post(data, id = null) {
+    write(data, id = null) {
         try {
             const recordId = id || this.id;
             localStorage.setItem(recordId.toString(), data);

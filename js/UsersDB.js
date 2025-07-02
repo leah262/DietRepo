@@ -29,13 +29,13 @@ class UsersDB extends DB {
             return this.readById(userId);
         }
     }
-    postUser(user) {
+    write(user) {
         user.id = this.id;
         this.id++;
         let usersEmail = JSON.parse(localStorage.getItem("userEmails&Id"));
         usersEmail.push({ id: this.id - 1, email: user.email });
         localStorage.setItem("userEmails&Id", JSON.stringify(usersEmail));
-        this.post(JSON.stringify(user), this.id - 1);
+        this.write(JSON.stringify(user), this.id - 1);
     }
 }
 export default  UsersDB;

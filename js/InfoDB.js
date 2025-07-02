@@ -3,146 +3,92 @@ import DB from "./DB.js";
 class InfoDB extends DB {
     constructor() {
         super();
-        this.prefix = 'diet_'; // קידומת לרשומות דיאטה
-        this.userRecordsKey = 'user_records_'; // קידומת למעקב אחר רשומות משתמש
+        this.prefix = 'diet_';
+        this.userRecordsKey = 'user_records_';
     }
 
-    // ✅ מזהה ייחודי שנשמר בלוקל סטורג'
     get id() {
         let currentId = parseInt(localStorage.getItem("diet_id") || "0") + 1;
         localStorage.setItem("diet_id", currentId);
         return currentId;
     }
 
-    // הוספת רשומה חדשה
     addRecord(record) {
-        try {
-            const recordId = this.id;
-            record.id = recordId;
-            record.timestamp = record.timestamp || new Date().toISOString();
+        const recordId = this.id;
+        record.id = recordId;
+        record.timestamp = record.timestamp || new Date().toISOString();
 
-            // שמירת הרשומה
-            const recordKey = this.prefix + recordId;
-            this.post(JSON.stringify(record), recordKey);
+        const recordKey = this.prefix + recordId;
+        this.write(JSON.stringify(record), recordKey);
+        this.addToUserRecords(record.userId, recordId);
 
-            // עדכון רשימת הרשומות של המשתמש
-            this.addToUserRecords(record.userId, recordId);
-
-            return recordId;
-        } catch (error) {
-            console.error('InfoDB: Error adding record:', error);
-            throw error;
-        }
+        return recordId;
     }
 
     addToUserRecords(userId, recordId) {
-        try {
-            const userRecordsKey = this.userRecordsKey + userId;
-            let recordIds = localStorage.getItem(userRecordsKey);
+        const userRecordsKey = this.userRecordsKey + userId;
+        let recordIds = JSON.parse(localStorage.getItem(userRecordsKey) || "[]");
 
-            if (!recordIds) {
-                recordIds = [];
-            } else {
-                recordIds = JSON.parse(recordIds);
-            }
-
-            const numericRecordId = parseInt(recordId);
-            if (!recordIds.includes(numericRecordId)) {
-                recordIds.push(numericRecordId);
-                localStorage.setItem(userRecordsKey, JSON.stringify(recordIds));
-            }
-        } catch (error) {
-            console.error('InfoDB: Error adding to user records:', error);
+        const numericRecordId = parseInt(recordId);
+        if (!recordIds.includes(numericRecordId)) {
+            recordIds.push(numericRecordId);
+            localStorage.setItem(userRecordsKey, JSON.stringify(recordIds));
         }
     }
 
     removeFromUserRecords(userId, recordId) {
-        try {
-            const userRecordsKey = this.userRecordsKey + userId;
-            let recordIds = localStorage.getItem(userRecordsKey);
+        const userRecordsKey = this.userRecordsKey + userId;
+        let recordIds = JSON.parse(localStorage.getItem(userRecordsKey) || "[]");
 
-            if (recordIds) {
-                recordIds = JSON.parse(recordIds);
-                const numericRecordId = parseInt(recordId);
-                const filteredIds = recordIds.filter(id => parseInt(id) !== numericRecordId);
-                localStorage.setItem(userRecordsKey, JSON.stringify(filteredIds));
-            }
-        } catch (error) {
-            console.error('InfoDB: Error removing from user records:', error);
-        }
+        const numericRecordId = parseInt(recordId);
+        const filteredIds = recordIds.filter(id => parseInt(id) !== numericRecordId);
+        localStorage.setItem(userRecordsKey, JSON.stringify(filteredIds));
     }
 
     getRecordsByUserId(userId) {
-        try {
-            const userRecordsKey = this.userRecordsKey + userId;
-            const recordIds = localStorage.getItem(userRecordsKey);
+        const userRecordsKey = this.userRecordsKey + userId;
+        const recordIds = JSON.parse(localStorage.getItem(userRecordsKey) || "[]");
+        const records = [];
 
-            if (!recordIds) return [];
-
-            const ids = JSON.parse(recordIds);
-            const records = [];
-
-            for (const id of ids) {
-                const recordKey = this.prefix + id;
-                const recordData = localStorage.getItem(recordKey);
-                if (recordData) {
-                    try {
-                        const parsedRecord = JSON.parse(recordData);
-                        records.push(parsedRecord);
-                    } catch (parseError) {
-                        console.error(`Error parsing record ${id}:`, parseError);
-                    }
+        for (const id of recordIds) {
+            const recordKey = this.prefix + id;
+            const recordData = localStorage.getItem(recordKey);
+            if (recordData) {
+                try {
+                    const parsedRecord = JSON.parse(recordData);
+                    records.push(parsedRecord);
+                } catch (_) {
+                    // ignore parse error
                 }
             }
-
-            return records;
-        } catch (error) {
-            console.error('InfoDB: Error getting user records:', error);
-            return [];
         }
+
+        return records;
     }
 
     updateRecord(recordId, updatedData) {
-        try {
-            const recordKey = this.prefix + recordId;
-            const existingData = localStorage.getItem(recordKey);
+        const recordKey = this.prefix + recordId;
+        const existingData = localStorage.getItem(recordKey);
+        if (!existingData) return null;
 
-            if (!existingData) throw new Error('Record not found');
+        const existingRecord = JSON.parse(existingData);
+        const updatedRecord = { ...existingRecord, ...updatedData, id: recordId };
 
-            const existingRecord = JSON.parse(existingData);
-            const updatedRecord = { ...existingRecord, ...updatedData, id: recordId };
-
-            localStorage.setItem(recordKey, JSON.stringify(updatedRecord));
-            return updatedRecord;
-        } catch (error) {
-            console.error('InfoDB: Error updating record:', error);
-            throw error;
-        }
+        localStorage.setItem(recordKey, JSON.stringify(updatedRecord));
+        return updatedRecord;
     }
 
     deleteRecord(recordId, userId) {
-        try {
-            const recordKey = this.prefix + recordId;
-
-            localStorage.removeItem(recordKey);
-            this.removeFromUserRecords(userId, recordId);
-
-            return true;
-        } catch (error) {
-            console.error('InfoDB: Error deleting record:', error);
-            return false;
-        }
+        const recordKey = this.prefix + recordId;
+        localStorage.removeItem(recordKey);
+        this.removeFromUserRecords(userId, recordId);
+        return true;
     }
 
     getRecord(recordId) {
-        try {
-            const recordKey = this.prefix + recordId;
-            const recordData = localStorage.getItem(recordKey);
-            return recordData ? JSON.parse(recordData) : null;
-        } catch (error) {
-            console.error('InfoDB: Error getting record:', error);
-            return null;
-        }
+        const recordKey = this.prefix + recordId;
+        const recordData = localStorage.getItem(recordKey);
+        return recordData ? JSON.parse(recordData) : null;
     }
 }
 

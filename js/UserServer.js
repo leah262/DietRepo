@@ -71,7 +71,7 @@ class UserServer extends Server {
         if (!userData.email || !userData.password) {
             return this.createResponse(false, "Email and password are required", 400, null);
         }
-        this.usersDB.postUser(userData);
+        this.usersDB.writeUser(userData);
         return this.createResponse(true, null, 201, null, userData)
     }
     handelLoginRequest(action, url, data, pathParts) {

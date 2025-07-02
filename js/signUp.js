@@ -95,7 +95,7 @@ class SignUpManager {
         fxhr.addEventListener('onReadyStateChange', (e) => {
             this.onReadyStateChange(e, submitBtn);
         });
-        fxhr.open('POST', "https://fake.server/api/Users-Servers/register?method=POST");
+        fxhr.open('POST', "https://fake.server/api/Users-Servers/register");
         console.log('SignUp: Sending user data:', user);
         fxhr.send(user);
         console.log('Request sent asynchronously');

@@ -2,6 +2,7 @@ class Server {
     constructor() {
         console.log("Server initialized");
     }
+
     handleRequest(url, data) {
         try {
             const method = this.extractMethod(url);
@@ -9,6 +10,7 @@ class Server {
             console.log(`Server: Handling ${method} request for path: ${url.pathname}`);
             console.log(`Server: Path parts:`, pathParts);
             console.log(`Server: Data received:`, data);
+
             switch (method.toLowerCase()) {
                 case 'get':
                     return this.get(url, pathParts);
@@ -26,6 +28,7 @@ class Server {
             return { error: error.message, status: 500 };
         }
     }
+
     extractMethod(url) {
         const urlParams = new URLSearchParams(url.search);
         const methodFromParams = urlParams.get('method');
@@ -56,19 +59,15 @@ class Server {
         console.log("DELETE method called - should be implemented by child class");
         return { message: "DELETE method not implemented", status: 501 };
     }
+
     createResponse(isSuccess, requestError, requestStatus, requestMessage, data = null) {
-        let response = {
+        const response = {
             success: isSuccess,
             status: requestStatus
         };
-        if (data) {
-            response.data = data;
-        }
-        if (requestMessage) {
-            response.message = requestMessage;
-        } else if (requestError) {
-            response.error = requestError;
-        }
+        if (data) response.data = data;
+        if (requestMessage) response.message = requestMessage;
+        else if (requestError) response.error = requestError;
         return response;
     }
 }
