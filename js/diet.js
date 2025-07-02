@@ -97,7 +97,7 @@ class Diet {
         const cancelEdit = document.getElementById('cancelEdit');
         const editForm = document.getElementById('editForm');
         const editModal = document.getElementById('editModal');
-        
+
         if (closeModal) {
             closeModal.addEventListener('click', this.closeModal.bind(this));
         }
@@ -160,6 +160,7 @@ class Diet {
 
     updateEntriesFromResponse(response) {
         this.entries = response.data || [];
+        sessionStorage.setItem('userEntries', JSON.stringify(this.entries));
         this.ui.renderEntries();
         this.ui.updateStats();
     }
@@ -193,10 +194,10 @@ class Diet {
     }
 
     validateEntry(entry) {
-        return this.validateName(entry.name) && 
-               this.validateCalories(entry.calories) && 
-               this.validateDate(entry.date) && 
-               this.validateMealType(entry.mealType);
+        return this.validateName(entry.name) &&
+            this.validateCalories(entry.calories) &&
+            this.validateDate(entry.date) &&
+            this.validateMealType(entry.mealType);
     }
 
     validateName(name) {
@@ -261,7 +262,13 @@ class Diet {
         this.resetForm();
         this.setTodaysDate();
         this.loadEntries();
+        this.addOneEntry(response.data)
     }
+    addOneEntry(entrie) {
+        let records = JSON.parse(sessionStorage.getItem("userEntries"));
+        records.push(entries);
+    }
+
 
     handleAddError(response) {
         console.error("Add failed:", response);

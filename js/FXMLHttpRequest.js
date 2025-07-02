@@ -21,6 +21,8 @@ class FXMLHttpRequest extends EventTarget {
             detail: { state: newState }
         });
         this.dispatchEvent(event);
+        console.log("on set state");
+        
     }
     
     get state() {
@@ -33,7 +35,7 @@ class FXMLHttpRequest extends EventTarget {
         this.request = new HttpRequest(method, url);
     }
     
-    send(details) {
+    send(details) {//body
         this.request.details = details;
         this.state = 2; // HEADERS_RECEIVED - השינוי: מיד אחרי שליחה
         

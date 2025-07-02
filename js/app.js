@@ -57,6 +57,7 @@ function theMainArea(currentPage) {
         detail: { pageName: currentPage }
     }));
 }
+//in functions init
 window.addEventListener('hashchange', (e) => {
     if (isInDiary && !location.hash.includes('diary')) {
         e.preventDefault();

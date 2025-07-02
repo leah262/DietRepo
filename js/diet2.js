@@ -7,12 +7,12 @@ class DietUI {
         const entriesList = document.getElementById('entriesList');
         const emptyState = document.getElementById('emptyState');
         const filteredEntries = this.diet.getFilteredEntries();
-        
+
         if (filteredEntries.length === 0) {
             this.showEmptyState(entriesList, emptyState);
             return;
         }
-        
+
         this.showEntriesList(entriesList, emptyState);
         this.populateEntriesList(entriesList, filteredEntries);
         this.setupEntryActionListeners();
@@ -40,7 +40,7 @@ class DietUI {
     createEntryCard(entry) {
         const formattedDate = this.formatDate(entry.date);
         const mealIcon = this.getMealIcon(entry.mealType);
-        
+
         return `
             <div class="entry-card" data-entry-id="${entry.id}">
                 ${this.createEntryHeader(mealIcon, entry.mealType, formattedDate)}
@@ -127,7 +127,28 @@ class DietUI {
             });
         });
     }
+    showOneEntry(entry) {
+        let entryCard = createEntryCard(entry);
+        addEntryToList(entryCard, entry.date);
+    }
+    addEntryToList(entryCard,date) {
+        const dateNew = new Date(entry.date);
+        const children = container.children;
 
+        // Find the right place to insert
+        let inserted = false;
+        for (let i = 0; i < children.length; i++) {
+            const existingDate = new Date(children[i].dataset.date);
+            if (dateNew > existingDate) {
+                container.insertBefore(newEl, children[i]);
+                inserted = true;
+                break;
+            }
+        }
+
+        if (!inserted) container.appendChild(newEl); // insert at end if needed
+        newEl.dataset.date = entry.date; //
+    }
     addDeleteListeners() {
         document.querySelectorAll('[data-action="delete"]').forEach(button => {
             button.addEventListener('click', (e) => {
@@ -140,11 +161,11 @@ class DietUI {
     updateStats() {
         const entries = this.diet.getEntries();
         const today = new Date().toISOString().split('T')[0];
-        
+
         const todayCalories = this.calculateTodayCalories(entries, today);
         const weekEntries = this.getWeekEntries(entries);
         const avgCalories = this.calculateAverageCalories(weekEntries);
-        
+
         this.updateStatsDisplay(todayCalories, weekEntries.length, avgCalories);
         this.addStatsAnimations();
     }
@@ -161,7 +182,7 @@ class DietUI {
     }
 
     calculateAverageCalories(weekEntries) {
-        return weekEntries.length > 0 ? 
+        return weekEntries.length > 0 ?
             Math.round(weekEntries.reduce((sum, entry) => sum + entry.calories, 0) / 7) : 0;
     }
 
@@ -198,7 +219,7 @@ class DietUI {
     filterByDate(entry, dateFilter) {
         const entryDate = new Date(entry.date);
         const today = new Date();
-        
+
         switch (dateFilter) {
             case 'today':
                 return this.isToday(entryDate, today);
@@ -231,7 +252,7 @@ class DietUI {
         const date = new Date(dateString);
         const today = new Date();
         const yesterday = this.getYesterday(today);
-        
+
         if (this.isToday(date, today)) {
             return 'היום';
         } else if (date.toDateString() === yesterday.toDateString()) {
@@ -303,10 +324,10 @@ class DietUI {
     }
 
     styleNotification(notification, type) {
-        const backgroundColor = type === 'success' ? 
-            'linear-gradient(135deg, #28a745, #20c997)' : 
+        const backgroundColor = type === 'success' ?
+            'linear-gradient(135deg, #28a745, #20c997)' :
             'linear-gradient(135deg, #dc3545, #fd7e14)';
-            
+
         notification.style.cssText = `
             position: fixed;
             top: 20px;
@@ -379,16 +400,16 @@ class DietUI {
     validateFormField(field, value, type) {
         const formGroup = field.closest('.form-group');
         this.removeExistingError(formGroup);
-        
+
         const validation = this.performValidation(value, type);
-        
+
         if (!validation.isValid) {
             this.showFieldError(formGroup, validation.message);
             this.styleInvalidField(field);
         } else {
             this.styleValidField(field);
         }
-        
+
         return validation.isValid;
     }
 

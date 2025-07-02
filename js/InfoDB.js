@@ -7,6 +7,13 @@ class InfoDB extends DB {
         this.userRecordsKey = 'user_records_'; // קידומת למעקב אחר רשומות משתמש
     }
 
+    // ✅ מזהה ייחודי שנשמר בלוקל סטורג'
+    get id() {
+        let currentId = parseInt(localStorage.getItem("diet_id") || "0") + 1;
+        localStorage.setItem("diet_id", currentId);
+        return currentId;
+    }
+
     // הוספת רשומה חדשה
     addRecord(record) {
         try {
@@ -27,7 +34,7 @@ class InfoDB extends DB {
             throw error;
         }
     }
-    // תיקון פונקציית הוספה לרשימת המשתמש
+
     addToUserRecords(userId, recordId) {
         try {
             const userRecordsKey = this.userRecordsKey + userId;
@@ -39,7 +46,6 @@ class InfoDB extends DB {
                 recordIds = JSON.parse(recordIds);
             }
 
-            // המרה לנומבר לוודא התאמה
             const numericRecordId = parseInt(recordId);
             if (!recordIds.includes(numericRecordId)) {
                 recordIds.push(numericRecordId);
@@ -50,7 +56,6 @@ class InfoDB extends DB {
         }
     }
 
-    // תיקון פונקציית הסרה מרשימת המשתמש
     removeFromUserRecords(userId, recordId) {
         try {
             const userRecordsKey = this.userRecordsKey + userId;
@@ -58,7 +63,6 @@ class InfoDB extends DB {
 
             if (recordIds) {
                 recordIds = JSON.parse(recordIds);
-                // המרה לנומבר לוודא התאמה
                 const numericRecordId = parseInt(recordId);
                 const filteredIds = recordIds.filter(id => parseInt(id) !== numericRecordId);
                 localStorage.setItem(userRecordsKey, JSON.stringify(filteredIds));
@@ -68,15 +72,12 @@ class InfoDB extends DB {
         }
     }
 
-    // תיקון פונקציית קבלת רשומות המשתמש
     getRecordsByUserId(userId) {
         try {
             const userRecordsKey = this.userRecordsKey + userId;
             const recordIds = localStorage.getItem(userRecordsKey);
 
-            if (!recordIds) {
-                return [];
-            }
+            if (!recordIds) return [];
 
             const ids = JSON.parse(recordIds);
             const records = [];
@@ -101,15 +102,12 @@ class InfoDB extends DB {
         }
     }
 
-    // עדכון רשומה
     updateRecord(recordId, updatedData) {
         try {
             const recordKey = this.prefix + recordId;
             const existingData = localStorage.getItem(recordKey);
 
-            if (!existingData) {
-                throw new Error('Record not found');
-            }
+            if (!existingData) throw new Error('Record not found');
 
             const existingRecord = JSON.parse(existingData);
             const updatedRecord = { ...existingRecord, ...updatedData, id: recordId };
@@ -122,15 +120,11 @@ class InfoDB extends DB {
         }
     }
 
-    // מחיקת רשומה
     deleteRecord(recordId, userId) {
         try {
             const recordKey = this.prefix + recordId;
 
-            // מחיקת הרשומה
             localStorage.removeItem(recordKey);
-
-            // הסרה מרשימת הרשומות של המשתמש
             this.removeFromUserRecords(userId, recordId);
 
             return true;
@@ -140,8 +134,6 @@ class InfoDB extends DB {
         }
     }
 
-    // הוספה לרשימת הרשומות של המשתמש
-    // קבלת רשומה בודדת
     getRecord(recordId) {
         try {
             const recordKey = this.prefix + recordId;

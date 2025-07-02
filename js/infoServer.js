@@ -53,11 +53,11 @@ class InfoServer extends Server {
         }
     }
 
-    delete(url, data, pathParts) {
+    delete(url, pathParts) {
         try {
             const recordId = pathParts[3];
             if (!recordId) return this.createResponse(false, "Record ID is required", 400, null);
-            const userId = data?.userId || this.infoDB.getRecord(recordId)?.userId;
+            const userId = this.infoDB.getRecord(recordId)?.userId;
             if (!userId) return this.createResponse(false, "User ID is required for deletion", 400, null);
             const success = this.infoDB.deleteRecord(recordId, userId);
             return success

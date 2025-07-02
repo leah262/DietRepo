@@ -82,6 +82,8 @@ class LoginManager {
         console.log("Login: Processing login for", loginData.email);
         let fxhr = new FXMLHttpRequest();
         fxhr.addEventListener('onReadyStateChange', (e) => {
+            console.log("in state event listner");
+          //here try around all  
             this.onReadyStateChange(e, submitBtn);
         });
         fxhr.open('POST', "https://fake.server/api/Users-Servers/login?method=POST");
@@ -94,6 +96,7 @@ class LoginManager {
         let fxhr = e.target;
 
         if (fxhr.state === 4) {
+            //check if its 200
             console.log("Login: Request completed, response:", fxhr.response);
             this.processLoginResponse(fxhr.response, submitBtn);
         }
