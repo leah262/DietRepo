@@ -161,4 +161,3 @@ class SignUpManager {
 const signUpManager = new SignUpManager();
 signUpManager.init();
 export default signUpManager;
-

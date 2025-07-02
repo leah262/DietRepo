@@ -2,16 +2,16 @@ class Server {
     constructor() {
         console.log("Server initialized");
     }
-
-    handleRequest(url, data) {
+    handleRequest(url, data, method) {
         try {
-            const method = this.extractMethod(url);
+            // השימוש ב-method שהועבר כפרמטר במקום לחלץ מה-URL
+            const httpMethod = method || 'GET';
             const pathParts = url.pathname.split('/').filter(Boolean);
-            console.log(`Server: Handling ${method} request for path: ${url.pathname}`);
+            console.log(`Server: Handling ${httpMethod} request for path: ${url.pathname}`);
             console.log(`Server: Path parts:`, pathParts);
             console.log(`Server: Data received:`, data);
-
-            switch (method.toLowerCase()) {
+            
+            switch (httpMethod.toLowerCase()) {
                 case 'get':
                     return this.get(url, pathParts);
                 case 'post':
@@ -27,17 +27,6 @@ class Server {
             console.error("Server error:", error);
             return { error: error.message, status: 500 };
         }
-    }
-
-    extractMethod(url) {
-        const urlParams = new URLSearchParams(url.search);
-        const methodFromParams = urlParams.get('method');
-        if (methodFromParams) {
-            console.log(`Server: Method from URL params: ${methodFromParams}`);
-            return methodFromParams;
-        }
-        console.log("Server: Using default method: GET");
-        return 'GET';
     }
 
     get(url, pathParts) {
@@ -59,15 +48,20 @@ class Server {
         console.log("DELETE method called - should be implemented by child class");
         return { message: "DELETE method not implemented", status: 501 };
     }
-
+    
     createResponse(isSuccess, requestError, requestStatus, requestMessage, data = null) {
-        const response = {
+        let response = {
             success: isSuccess,
             status: requestStatus
         };
-        if (data) response.data = data;
-        if (requestMessage) response.message = requestMessage;
-        else if (requestError) response.error = requestError;
+        if (data) {
+            response.data = data;
+        }
+        if (requestMessage) {
+            response.message = requestMessage;
+        } else if (requestError) {
+            response.error = requestError;
+        }
         return response;
     }
 }

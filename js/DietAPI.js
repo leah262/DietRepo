@@ -5,7 +5,7 @@ class DietAPI {
         if (this.userId) {
             const fxhr = new FXMLHttpRequest();
             fxhr.addEventListener('onReadyStateChange', this.handleLoadResponse.bind(this));
-            fxhr.open('GET', `https://fake.server/api/Info-Servers/records/${this.userId}?method=GET`);
+            fxhr.open('GET', `https://fake.server/api/Info-Servers/records/${this.userId}`);
             fxhr.send(null);
         }
     }
@@ -42,7 +42,7 @@ class DietAPI {
         console.log("Sending entry to server:", entry);
         const fxhr = new FXMLHttpRequest();
         fxhr.addEventListener('onReadyStateChange', this.handleAddResponse.bind(this));
-        fxhr.open('POST', 'https://fake.server/api/Info-Servers/records?method=POST');
+        fxhr.open('POST', 'https://fake.server/api/Info-Servers/records');
         fxhr.send(entry);
     }
 
@@ -85,7 +85,7 @@ class DietAPI {
     updateEntryOnServer(entry) {
         const fxhr = new FXMLHttpRequest();
         fxhr.addEventListener('onReadyStateChange', this.handleUpdateResponse.bind(this));
-        fxhr.open('PUT', `https://fake.server/api/Info-Servers/records/${entry.id}?method=PUT`);
+        fxhr.open('PUT', `https://fake.server/api/Info-Servers/records/${entry.id}`);
         fxhr.send(entry);
     }
 
@@ -120,7 +120,7 @@ class DietAPI {
         const numericId = parseInt(entryId);
         const fxhr = new FXMLHttpRequest();
         fxhr.addEventListener('onReadyStateChange', this.handleDeleteResponse.bind(this));
-        fxhr.open('DELETE', `https://fake.server/api/Info-Servers/records/${numericId}?method=DELETE`);
+        fxhr.open('DELETE', `https://fake.server/api/Info-Servers/records/${numericId}`);
         fxhr.send({ id: numericId, userId: this.userId });
     }
 

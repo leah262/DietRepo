@@ -86,7 +86,7 @@ class LoginManager {
             //here try around all  
             this.onReadyStateChange(e, submitBtn);
         });
-        fxhr.open('POST', "https://fake.server/api/Users-Servers/login?method=POST");
+        fxhr.open('POST', "https://fake.server/api/Users-Servers/login");
         console.log('Login: Sending login data:', loginData);
         fxhr.send(loginData);
         console.log('Login request sent asynchronously');
