@@ -71,7 +71,7 @@ class UserServer extends Server {
         if (!userData.email || !userData.password) {
             return this.createResponse(false, "Email and password are required", 400, null);
         }
-        this.usersDB.writeUser(userData);
+        this.usersDB.write(userData);
         return this.createResponse(true, null, 201, null, userData)
     }
     handelLoginRequest(action, url, data, pathParts) {
@@ -92,7 +92,10 @@ class UserServer extends Server {
         return this.createResponse(true, null, 200, "Login successful", {
             id: foundUser.id,
             email: foundUser.email,
-        })
+            firstName: foundUser.firstName,  
+            lastName: foundUser.lastName     
+        });
+
     }
 
     put(url, data, pathParts) {

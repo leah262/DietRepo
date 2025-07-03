@@ -4,8 +4,8 @@
 // import DietActions from './DietActions.js';
 // import DietRenderer from './DietRenderer.js';
 // import DietCore from './DietCore.js'
-class DietNotifications{
-        showSuccess(message) {
+class DietNotifications {
+    showSuccess(message) {
         this.showNotification(message, 'success');
     }
 
@@ -196,6 +196,20 @@ class DietNotifications{
     styleValidField(field) {
         field.style.borderColor = '#28a745';
         field.style.boxShadow = '0 0 0 3px rgba(40, 167, 69, 0.1)';
+    }
+    showLoadingSpinner(buttonElement, originalText) {
+        buttonElement.disabled = true;
+        buttonElement.innerHTML = `
+        <div class="spinner"></div>
+        ${originalText}
+    `;
+        buttonElement.classList.add('loading');
+    }
+
+    removeLoadingSpinner(buttonElement, originalText) {
+        buttonElement.disabled = false;
+        buttonElement.innerHTML = originalText;
+        buttonElement.classList.remove('loading');
     }
 }
 

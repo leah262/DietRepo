@@ -1,5 +1,5 @@
 import FXMLHttpRequest from "./FXMLHttpRequest.js";
-import { logout } from './App.js';
+import { logout } from './app.js';
 import DietAPI from './DietAPI.js';
 import DietActions from './DietActions.js';
 import DietRenderer from './DietRenderer.js';
@@ -12,13 +12,13 @@ class DietCore extends DietAPI {
         this.renderer = new DietRenderer();
         this.actions = new DietActions();
         this.notifications = new DietNotifications();
-        
+
         // קישור בין המחלקות
         this.renderer.diet = this;
         this.actions.diet = this;
         this.actions.ui = this.notifications;
         this.ui = this.notifications; // לתאימות לאחור
-        
+
         console.log("userId", this.userId);
         this.initWhenReady();
     }
@@ -132,6 +132,8 @@ class DietCore extends DietAPI {
         const entry = this.createEntryFromForm(e.target);
         console.log("Entry data:", entry);
         if (this.validateEntry(entry)) {
+            const submitBtn = document.querySelector('#diaryForm button[type="submit"]');
+            this.ui.showLoadingSpinner(submitBtn, 'הוסף רשומה');
             this.addEntryToServer(entry);
         }
     }
@@ -159,6 +161,8 @@ class DietCore extends DietAPI {
         e.preventDefault();
         const updatedEntry = this.createUpdatedEntry(e.target);
         if (this.validateEntry(updatedEntry)) {
+            const updateBtn = document.querySelector('#editForm button[type="submit"]');
+            this.ui.showLoadingSpinner(updateBtn, 'עדכן רשומה');
             this.updateEntryOnServer(updatedEntry);
         }
     }
@@ -177,6 +181,8 @@ class DietCore extends DietAPI {
 
     deleteEntry(entryId) {
         if (confirm('את בטוחה שאת רוצה למחוק את הרשומה הזו?')) {
+            const deleteBtn = document.querySelector(`[data-action="delete"][data-id="${entryId}"]`);
+            this.ui.showLoadingSpinner(deleteBtn, 'מחק');
             this.performDelete(entryId);
         }
     }
@@ -291,7 +297,7 @@ class DietCore extends DietAPI {
     getEntries() {
         return this.entries;
     }
-    
+
     getFilteredEntries() {
         return this.filterEntries();
     }
@@ -303,12 +309,12 @@ class DietCore extends DietAPI {
             return dateMatch && mealMatch;
         });
     }
-    
+
     clearCurrentInstance() {
         this.entries = [];
         this.currentEditId = null;
     }
-    
+
     editName() {
         const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
         const titleElement = document.getElementById('diary-titles');
@@ -316,7 +322,7 @@ class DietCore extends DietAPI {
             titleElement.textContent = currentUser.firstName;
         }
     }
-    
+
     setTodaysDate() {
         const today = new Date().toISOString().split('T')[0];
         const dateInput = document.getElementById('date');
@@ -334,6 +340,8 @@ class DietCore extends DietAPI {
     }
 
     handleAddSuccess(response) {
+        const submitBtn = document.querySelector('#diaryForm button[type="submit"]');
+        this.ui.removeLoadingSpinner(submitBtn, 'הוסף רשומה');
         this.ui.showSuccess('הרשומה נוספה בהצלחה! 🎉');
         this.resetForm();
         this.setTodaysDate();
@@ -341,12 +349,16 @@ class DietCore extends DietAPI {
     }
 
     handleUpdateSuccess() {
+        const submitBtn = document.querySelector('#diaryForm button[type="submit"]');
+        this.ui.removeLoadingSpinner(submitBtn, 'הוסף רשומה');
         this.ui.showSuccess('הרשומה עודכנה בהצלחה! ✨');
         this.closeModal();
         this.loadEntries();
     }
 
     handleDeleteSuccess() {
+        const submitBtn = document.querySelector('#diaryForm button[type="submit"]');
+        this.ui.removeLoadingSpinner(submitBtn, 'הוסף רשומה');
         this.ui.showSuccess('הרשומה נמחקה בהצלחה! 🗑️');
         this.loadEntries();
     }

@@ -35,7 +35,10 @@ class UsersDB extends DB {
         let usersEmail = JSON.parse(localStorage.getItem("userEmails&Id"));
         usersEmail.push({ id: this.id - 1, email: user.email });
         localStorage.setItem("userEmails&Id", JSON.stringify(usersEmail));
-        this.write(JSON.stringify(user), this.id - 1);
+        this.writeUser(JSON.stringify(user), this.id - 1);
+    }
+    writeUser(user,userId){
+        localStorage.setItem(userId,user);
     }
 }
 export default  UsersDB;

@@ -1,5 +1,5 @@
 import AuthManager from './AurhManager.js';
-import { switchPage } from './App.js';
+import { switchPage } from './app.js';
 import FXMLHttpRequest from './FXMLHttpRequest.js';
 class LoginManager {
     constructor() {
@@ -138,8 +138,8 @@ class LoginManager {
         const userData = {
             id: response.data?.id || response.id,
             email: response.data?.email || response.email,
-            firstName: response.data?.firstName,
-            lastName: response.data?.lastName
+            firstName: response.data?.firstName || response.firstName,
+            lastName: response.data?.lastName || response.lastName
         };
         sessionStorage.setItem('currentUser', JSON.stringify(userData));
         console.log("User data saved to sessionStorage:", userData);
