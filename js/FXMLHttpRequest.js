@@ -11,7 +11,7 @@ class FXMLHttpRequest extends EventTarget {
         this.netWork = NetWork;
         this.response = null;
     }
-    get responseText(){
+    get responseText() {
         return this.response;
     }
     set state(newState) {
@@ -22,46 +22,73 @@ class FXMLHttpRequest extends EventTarget {
         });
         this.dispatchEvent(event);
         console.log("on set state");
-        
+
     }
-    
+
     get state() {
         return this._state;
     }
-    
+
     open(method, url) {
         this.state = 1; // OPENED
         console.log("FXMLHttpRequest: Opening connection");
         this.request = new HttpRequest(method, url);
     }
-    
-    send(details) {//body
-        this.request.details = details;
-        this.state = 2; // HEADERS_RECEIVED - השינוי: מיד אחרי שליחה
-        
+
+    send(details) {
+        this.prepareRequest(details);
+        this.state = 2; // HEADERS_RECEIVED
+
         console.log("FXMLHttpRequest: Sending request...");
-        
-        // השינוי: שליחה אסינכרונית עם callback
+
         this.netWork.sendRequest(this.request, (response) => {
-            console.log("FXMLHttpRequest: Response received", response);
-            this.response = JSON.stringify(response);
-            this.status = response.status || 200;
-            
-            // השינוי: עדכון מדורג של ה-state
-            setTimeout(() => {
-                this.state = 3; // LOADING
-                setTimeout(() => {
-                    this.state = 4; // DONE - השינוי: בקשה הושלמה
-                }, 100);
-            }, 100);
+            if (this.isErrorResponse(response)) {
+                this.handleErrorResponse(response);
+                return;
+            }
+
+            this.handleSuccessResponse(response);
         });
     }
-    
-    
-    
-    onError(type) {
-        // נשאר ריק
+    prepareRequest(details) {
+        this.request.details = details;
     }
+
+    isErrorResponse(response) {
+        return !response || response.error || response.status >= 400;
+    }
+
+    handleErrorResponse(response) {
+        const msg = response?.error || "Unknown network error";
+        this.onError(msg);
+    }
+
+    handleSuccessResponse(response) {
+        console.log("FXMLHttpRequest: Response received", response);
+        this.response = JSON.stringify(response);
+        this.status = response.status || 200;
+
+        this.simulateStateProgression();
+    }
+
+    simulateStateProgression() {
+        setTimeout(() => {
+            this.state = 3; // LOADING
+            setTimeout(() => {
+                this.state = 4; // DONE
+            }, 100);
+        }, 100);
+    }
+
+    onError(errorMessage) {
+        this.state = 4;
+        this.status = 500;
+        const errorEvent = new CustomEvent('error', {
+            detail: { message: errorMessage }
+        });
+        this.dispatchEvent(errorEvent);
+    }
+
 }
 
 export default FXMLHttpRequest;
