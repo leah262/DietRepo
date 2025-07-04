@@ -1,5 +1,5 @@
-import AuthManager from './AurhManager.js';
 import { switchPage } from './app.js';
+import AuthManager from './AurhManager.js';
 import FXMLHttpRequest from './FXMLHttpRequest.js';
 class LoginManager {
     constructor() {
@@ -38,14 +38,14 @@ class LoginManager {
                 switchPage('signUp');
             });
         }
-        this.validateSingleField();
+        // this.validateSingleField();
     }
-    validateSingleField(input) {
-        const fieldName = input.name;
-        const fieldValue = input.value;
-        const validation = AuthManager.validateLoginField(fieldName, fieldValue);
-        return true;
-    }
+    // validateSingleField(input) {
+    //     const fieldName = input.name;
+    //     const fieldValue = input.value;
+    //     const validation = AuthManager.validateLoginField(fieldName, fieldValue);
+    //     return true;
+    // }
     handleSubmit(e) {
         console.log("Login: Form submitted");
         e.preventDefault();

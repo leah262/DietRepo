@@ -1,6 +1,7 @@
 import DietCore from "./DietCore.js";
 let isInDiary = false; // דגל למעקב אחר מיקום בדיארי
 function init() {
+    // location.hash='#signUp'
     if (!location.hash || location.hash === '#') {
         location.hash = '#signUp';
         return;
@@ -15,8 +16,8 @@ export function switchPage(pageName) {
 export function logout() {
     sessionStorage.removeItem('currentUser');
     isInDiary = false;
-    history.replaceState(null, null, '#signUp');
-    location.hash = '#signUp';
+    history.replaceState(null, null, '#login');
+    location.hash = '#login';
     let blockedBack = false;
     window.onpopstate = function () {
         if (!blockedBack) {

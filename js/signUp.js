@@ -39,21 +39,6 @@ class SignUpManager {
                 switchPage('login');
             });
         }
-        this.validateSingleField();
-    }
-    validateSingleField(input) {
-        const fieldName = input.name;
-        const fieldValue = input.value;
-        const additionalData = {};
-        if (fieldName === 'confirmPassword') {
-            const passwordField = this.form.querySelector('#password');
-            additionalData.password = passwordField ? passwordField.value : '';
-        }
-        const validation = AuthManager.validateSignUpField(fieldName, fieldValue, additionalData);
-        if (!validation.isValid) {
-            return false;
-        }
-        return true;
     }
     handleSubmit(e) {
         console.log("SignUp: Form submitted");

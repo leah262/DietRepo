@@ -92,10 +92,7 @@ class UserServer extends Server {
         return this.createResponse(true, null, 200, "Login successful", {
             id: foundUser.id,
             email: foundUser.email,
-            firstName: foundUser.firstName,  
-            lastName: foundUser.lastName     
-        });
-
+        })
     }
 
     put(url, data, pathParts) {
@@ -114,7 +111,7 @@ class UserServer extends Server {
                     return this.createResponse(false, "User not found", 404, null);
                 }
                 const updatedUser = { ...existingUser, ...userData };
-                this.usersDB.post(JSON.stringify(updatedUser), existingUser.id);
+                this.usersDB.write(JSON.stringify(updatedUser), existingUser.id);
                 return this.createResponse(true, null, 200, "User updated successfully", updatedUser);
             }
             return this.createResponse(false, `Action '${action}' not found`, 404, null);

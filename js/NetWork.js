@@ -6,7 +6,7 @@ class NetWork {
         this.infoServer = InfoServer;
     }
     sendRequest(httpRequest, callback) {
-        console.log("NetWork: Processing request for URL:", httpRequest.section.href);
+        console.log("NetWork: Processing request for URL:", httpRequest.section.toString());
         console.log("NetWork: URL pathname:", httpRequest.section.pathname);
         console.log("NetWork: HTTP Method:", httpRequest.method);
         
