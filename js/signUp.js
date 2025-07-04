@@ -8,7 +8,7 @@ class SignUpManager {
         this.isInitialized = false;
     }
     init() {
-        if (this.isInitialized) return;
+        // if (this.isInitialized) return;
         this.bindEvents();
         this.isInitialized = true;
     }

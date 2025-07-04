@@ -38,14 +38,8 @@ class LoginManager {
                 switchPage('signUp');
             });
         }
-        // this.validateSingleField();
+
     }
-    // validateSingleField(input) {
-    //     const fieldName = input.name;
-    //     const fieldValue = input.value;
-    //     const validation = AuthManager.validateLoginField(fieldName, fieldValue);
-    //     return true;
-    // }
     handleSubmit(e) {
         console.log("Login: Form submitted");
         e.preventDefault();

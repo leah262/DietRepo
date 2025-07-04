@@ -1,14 +1,20 @@
 import UserServer from "./UserServer.js";
 import InfoServer from "./InfoServer.js";
+
 class NetWork {
     constructor() {
         this.userServer = UserServer;
         this.infoServer = InfoServer;
+        this.NETWORK_WRONG = 0;
     }
+
     sendRequest(httpRequest, callback) {
         console.log("NetWork: Processing request for URL:", httpRequest.section.toString());
         console.log("NetWork: URL pathname:", httpRequest.section.pathname);
         console.log("NetWork: HTTP Method:", httpRequest.method);
+        
+        // בדיקת שגיאת רשת
+        if (this._checkNetworkError()) return;
         
         const url = httpRequest.section;
         if (this._invalidProtocol(url)) {
@@ -22,9 +28,22 @@ class NetWork {
             callback && callback(response);
         }, 1000);
     }
+
+    _checkNetworkError() {
+        this.NETWORK_WRONG++;
+        if (this.NETWORK_WRONG % 10 === 0) {
+            alert("שגיאת רשת - הבקשה נדחתה");
+            // הוספת event לעצירת loading spinners
+            window.dispatchEvent(new CustomEvent('networkError'));
+            return true;
+        }
+        return false;
+    }
+
     _invalidProtocol(url) {
         return url.protocol !== "http:" && url.protocol !== "https:";
     }
+
     _handleRouting(url, pathParts, details, method) {
         console.log(url);
         if (pathParts[1] === "Users-Servers") {
