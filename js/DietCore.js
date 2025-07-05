@@ -121,7 +121,7 @@ class DietCore extends DietAPI {
         }
     } 
     setupLogoutButton() {
-        const logoutBtn = document.getElementById('logoutBtn');
+        const logoutBtn = document.getElementById('logout-btn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', this.handleLogout.bind(this));
         }
