@@ -13,15 +13,22 @@ class NetWork {
         console.log("NetWork: URL pathname:", httpRequest.section.pathname);
         console.log("NetWork: HTTP Method:", httpRequest.method);
         
-        // בדיקת שגיאת רשת
-        if (this._checkNetworkError()) return;
+        // בדיקת שגיאת רשת - אם יש שגיאה, לא ממשיכים
+        if (this._checkNetworkError()) {
+            // מחזירים שגיאה מיד ולא מבצעים את הפעולה
+            callback && callback({ success: false, error: "Network error", status: 500 });
+            return;
+        }
         
         const url = httpRequest.section;
         if (this._invalidProtocol(url)) {
             return callback && setTimeout(() => callback({ success: false, error: "Invalid protocol", status: 400 }), 100);
         }
+        
         const pathParts = url.pathname.split('/').filter(Boolean);
         console.log("NetWork: Path parts:", pathParts);
+        
+        // ביצוע הבקשה רק אם אין שגיאת רשת
         setTimeout(() => {
             const response = this._handleRouting(url, pathParts, httpRequest.details, httpRequest.method);
             console.log("NetWork: Sending response:", response);
@@ -32,10 +39,10 @@ class NetWork {
     _checkNetworkError() {
         this.NETWORK_WRONG++;
         if (this.NETWORK_WRONG % 10 === 0) {
-            alert("שגיאת רשת - הבקשה נדחתה");
-            // הוספת event לעצירת loading spinners
+            alert('Network Failed')
+            // התרעה על שגיאת רשת
             window.dispatchEvent(new CustomEvent('networkError'));
-            return true;
+            return true; // מחזירים true כדי לעצור את הפעולה
         }
         return false;
     }

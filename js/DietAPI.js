@@ -13,141 +13,144 @@ class DietAPI {
     handleLoadResponse(e) {
         const fxhr = e.target;
         if (fxhr.state === 4) {
-            this.processLoadResponse(fxhr);
+            const response = JSON.parse(fxhr.responseText);
+            console.log("Load response:", response);
+            if (response && response.success) {
+                this.updateEntriesFromResponse(response);
+            } else {
+                console.error("Load failed:", response);
+            }
         }
-    }
-
-    processLoadResponse(fxhr) {
-        const response = JSON.parse(fxhr.responseText);
-        console.log("Load response:", response);
-        if (response && response.success) {
-            this.updateEntriesFromResponse(response);
-        } else {
-            this.handleLoadError(response);
-        }
-    }
-
-    updateEntriesFromResponse(response) {
-        this.entries = response.data || [];
-        sessionStorage.setItem('userEntries', JSON.stringify(this.entries));
-        // ה-UI יטופל במחלקה שיורשת
-    }
-
-    handleLoadError(response) {
-        console.error("Load failed:", response);
-        // ה-UI יטופל במחלקה שיורשת
     }
 
     addEntryToServer(entry) {
         console.log("Sending entry to server:", entry);
-        const fxhr = new FXMLHttpRequest();
-        fxhr.addEventListener('onReadyStateChange', this.handleAddResponse.bind(this));
-        fxhr.open('POST', 'https://fake.server/api/Info-Servers/records');
-        fxhr.send(entry);
+        this.makeRequest('POST', 'https://fake.server/api/Info-Servers/records', entry, this.handleAddResponse.bind(this));
     }
 
     handleAddResponse(e) {
         const fxhr = e.target;
         if (fxhr.state === 4) {
-            this.processAddResponse(fxhr);
+            const response = JSON.parse(fxhr.responseText);
+            console.log("Add response:", response);
+            if (response && response.success) {
+                // הוספת הרשומה מקומית מיד בלי לטעון מחדש
+                if (response.data) {
+                    this.addEntryLocally(response.data);
+                }
+                this.handleAddSuccess(response);
+            } else {
+                console.error("Add failed:", response);
+                this.handleAddError(response);
+            }
         }
     }
 
-    processAddResponse(fxhr) {
-        const response = JSON.parse(fxhr.responseText);
-        console.log("Add response:", response);
-        if (response && response.success) {
-            this.handleAddSuccess(response);
-        } else {
-            this.handleAddError(response);
-        }
-    }
-
-    handleAddSuccess(response) {
-        // יטופל במחלקה שיורשת
-        this.loadEntries();
-        if (response.data) {
-            this.addOneEntry(response.data);
-        }
-    }
-
-    addOneEntry(entry) { // תיקון שם הפרמטר
-        let records = JSON.parse(sessionStorage.getItem("userEntries")) || [];
-        records.push(entry); // תיקון שם המשתנה
-        sessionStorage.setItem("userEntries", JSON.stringify(records));
-    }
-
-    handleAddError(response) {
-        console.error("Add failed:", response);
-        // יטופל במחלקה שיורשת
+    addEntryLocally(entry) {
+        // הוספה מקומית לרשימה
+        this.entries.unshift(entry); // מוסיף בהתחלה כדי שיופיע למעלה
+        sessionStorage.setItem("userEntries", JSON.stringify(this.entries));
+        // עדכון הצגה מקומית
+        this.refreshUI();
     }
 
     updateEntryOnServer(entry) {
-        const fxhr = new FXMLHttpRequest();
-        fxhr.addEventListener('onReadyStateChange', this.handleUpdateResponse.bind(this));
-        fxhr.open('PUT', `https://fake.server/api/Info-Servers/records/${entry.id}`);
-        fxhr.send(entry);
+        this.makeRequest('PUT', `https://fake.server/api/Info-Servers/records/${entry.id}`, entry, this.handleUpdateResponse.bind(this));
     }
 
     handleUpdateResponse(e) {
         const fxhr = e.target;
         if (fxhr.state === 4) {
-            this.processUpdateResponse(fxhr);
+            const response = JSON.parse(fxhr.responseText);
+            console.log("Update response:", response);
+            if (response && response.success) {
+                // עדכון מקומי של הרשומה
+                this.updateEntryLocally(response.data || entry);
+                this.handleUpdateSuccess();
+            } else {
+                console.error("Update failed:", response);
+                this.handleUpdateError(response);
+            }
         }
     }
 
-    processUpdateResponse(fxhr) {
-        const response = JSON.parse(fxhr.responseText);
-        console.log("Update response:", response);
-        if (response && response.success) {
-            this.handleUpdateSuccess();
-        } else {
-            this.handleUpdateError(response);
+    updateEntryLocally(updatedEntry) {
+        const index = this.entries.findIndex(e => parseInt(e.id) === parseInt(updatedEntry.id));
+        if (index !== -1) {
+            this.entries[index] = updatedEntry;
+            sessionStorage.setItem("userEntries", JSON.stringify(this.entries));
+            this.refreshUI();
         }
-    }
-
-    handleUpdateSuccess() {
-        // יטופל במחלקה שיורשת
-        this.loadEntries();
-    }
-
-    handleUpdateError(response) {
-        console.error("Update failed:", response);
-        // יטופל במחלקה שיורשת
     }
 
     performDelete(entryId) {
         const numericId = parseInt(entryId);
-        const fxhr = new FXMLHttpRequest();
-        fxhr.addEventListener('onReadyStateChange', this.handleDeleteResponse.bind(this));
-        fxhr.open('DELETE', `https://fake.server/api/Info-Servers/records/${numericId}`);
-        fxhr.send({ id: numericId, userId: this.userId });
+        this.makeRequest('DELETE', `https://fake.server/api/Info-Servers/records/${numericId}`, 
+            { id: numericId, userId: this.userId }, this.handleDeleteResponse.bind(this));
     }
 
     handleDeleteResponse(e) {
         const fxhr = e.target;
         if (fxhr.state === 4) {
-            this.processDeleteResponse(fxhr);
+            const response = JSON.parse(fxhr.responseText);
+            console.log("Delete response:", response);
+            if (response && response.success) {
+                // מחיקה מקומית
+                this.deleteEntryLocally(response.deletedId || this.lastDeletedId);
+                this.handleDeleteSuccess();
+            } else {
+                console.error("Delete failed:", response);
+                this.handleDeleteError(response);
+            }
         }
     }
 
-    processDeleteResponse(fxhr) {
-        const response = JSON.parse(fxhr.responseText);
-        console.log("Delete response:", response);
-        if (response && response.success) {
-            this.handleDeleteSuccess();
-        } else {
-            this.handleDeleteError(response);
-        }
+    deleteEntryLocally(entryId) {
+        const numericId = parseInt(entryId);
+        this.entries = this.entries.filter(e => parseInt(e.id) !== numericId);
+        sessionStorage.setItem("userEntries", JSON.stringify(this.entries));
+        this.refreshUI();
+    }
+
+    // Helper method to reduce code duplication
+    makeRequest(method, url, data, callback) {
+        const fxhr = new FXMLHttpRequest();
+        fxhr.addEventListener('onReadyStateChange', callback);
+        fxhr.open(method, url);
+        fxhr.send(data);
+    }
+
+    // These methods will be overridden in DietCore
+    updateEntriesFromResponse(response) {
+        this.entries = response.data || [];
+        sessionStorage.setItem('userEntries', JSON.stringify(this.entries));
+    }
+
+    handleAddSuccess(response) {
+        // יטופל במחלקה שיורשת
+    }
+
+    handleAddError(response) {
+        // יטופל במחלקה שיורשת
+    }
+
+    handleUpdateSuccess() {
+        // יטופל במחלקה שיורשת
+    }
+
+    handleUpdateError(response) {
+        // יטופל במחלקה שיורשת
     }
 
     handleDeleteSuccess() {
         // יטופל במחלקה שיורשת
-        this.loadEntries();
     }
 
     handleDeleteError(response) {
-        console.error("Delete failed:", response);
+        // יטופל במחלקה שיורשת
+    }
+
+    refreshUI() {
         // יטופל במחלקה שיורשת
     }
 }
